@@ -3,7 +3,8 @@ session_start();
 error_reporting(0);
 include('includes/config.php');
 if (strlen($_SESSION['alogin']) == 0) {
-    header('location:index.php');
+    header("location:../adminlogin.php"); 
+    exit(); // Thêm exit để đảm bảo ngừng thực thi mã sau khi chuyển hướng
 } else { ?>
     <!DOCTYPE html>
     <html xmlns="http://www.w3.org/1999/xhtml">
