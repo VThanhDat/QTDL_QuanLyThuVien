@@ -3,7 +3,7 @@ session_start();
 
 include('includes/config.php');
 if (strlen($_SESSION['alogin']) == 0) {
-    header('location:dashboard.php');
+    header("location:../adminlogin.php"); 
     exit(); // Thêm exit để đảm bảo ngừng thực thi mã sau khi chuyển hướng
 } 
 

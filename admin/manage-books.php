@@ -3,19 +3,21 @@ session_start();
 error_reporting(0);
 include('includes/config.php');
 if (strlen($_SESSION['alogin']) == 0) {
-    header("location:../adminlogin.php"); 
+    header("location:../adminlogin.php");
     exit();
 } else {
     if (isset($_GET['del'])) {
         $id = $_GET['del'];
-        $sql = "delete from tacgia WHERE id=:id";
+        $sql = "delete from sach WHERE id=:id";
         $query = $dbh->prepare($sql);
         $query->bindParam(':id', $id, PDO::PARAM_STR);
         $query->execute();
-        $_SESSION['delmsg'] = "Xóa tác giả thành công";
-        header('location:manage-authors.php');
+        $_SESSION['delmsg'] = "Xóa sách thành công";
+        header('location:manage-books.php');
         exit();
     }
+
+
 ?>
     <!DOCTYPE html>
     <html xmlns="http://www.w3.org/1999/xhtml">
@@ -25,7 +27,7 @@ if (strlen($_SESSION['alogin']) == 0) {
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
         <meta name="description" content="" />
         <meta name="author" content="" />
-        <title>Ouản Lý Thư Viện | Quản Lý Tác Giả</title>
+        <title>Ouản Lý Thư Viện | Quản Lý Sách</title>
         <!-- BOOTSTRAP CORE STYLE  -->
         <link href="assets/css/bootstrap.css" rel="stylesheet" />
         <!-- FONT AWESOME STYLE  -->
@@ -47,7 +49,7 @@ if (strlen($_SESSION['alogin']) == 0) {
             <div class="container">
                 <div class="row pad-botm">
                     <div class="col-md-12">
-                        <h4 class="header-line">Quản lý tác giả</h4>
+                        <h4 class="header-line">Quản Lý Sách</h4>
                     </div>
                     <div class="row">
                         <?php if ($_SESSION['error']) { ?>
@@ -77,6 +79,7 @@ if (strlen($_SESSION['alogin']) == 0) {
                             </div>
                         <?php } ?>
 
+
                         <?php if ($_SESSION['delmsg']) { ?>
                             <div class="col-md-6">
                                 <div class="alert alert-success">
@@ -85,14 +88,17 @@ if (strlen($_SESSION['alogin']) == 0) {
                                 </div>
                             </div>
                         <?php } ?>
+
                     </div>
+
+
                 </div>
                 <div class="row">
                     <div class="col-md-12">
                         <!-- Advanced Tables -->
                         <div class="panel panel-default">
                             <div class="panel-heading">
-                                Danh sách tác giả
+                                Danh sách Sách
                             </div>
                             <div class="panel-body">
                                 <div class="table-responsive">
@@ -100,15 +106,18 @@ if (strlen($_SESSION['alogin']) == 0) {
                                         <thead>
                                             <tr>
                                                 <th>#</th>
+                                                <th>Tên Sách</th>
+                                                <th>Hình ảnh</th>
+                                                <th>Thể Loại</th>
                                                 <th>Tác Giả</th>
-
-                                                <th>Ngày Tạo</th>
-                                                <th>Ngày Cập Nhật</th>
+                                                <th>Giá</th>
+                                                <th>Số lượng</th>
+                                                <th>Hình thức</th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <?php $sql = "SELECT * from tacgia";
+                                            <?php $sql = "SELECT sach.BookName,sach.Image,theloai.CategoryName,tacgia.AuthorName,sach.BookPrice,sach.Quantity,sach.Stock,sach.Method,sach.id as bookid from sach join theloai on theloai.id=sach.CatId join tacgia on tacgia.id=sach.AuthorId";
                                             $query = $dbh->prepare($sql);
                                             $query->execute();
                                             $results = $query->fetchAll(PDO::FETCH_OBJ);
@@ -117,16 +126,27 @@ if (strlen($_SESSION['alogin']) == 0) {
                                                 foreach ($results as $result) {               ?>
                                                     <tr class="odd gradeX">
                                                         <td class="center"><?php echo htmlentities($cnt); ?></td>
-                                                        <td class="center"><?php echo htmlentities($result->AuthorName); ?></td>
-                                                        <td class="center"><?php echo htmlentities($result->CreationDate); ?></td>
-                                                        <td class="center"><?php echo htmlentities($result->UpdationDate); ?></td>
+                                                        <td class="center"><?php echo htmlentities($result->BookName); ?></td>
                                                         <td class="center">
-
-                                                            <a href="edit-author.php?athrid=<?php echo htmlentities($result->id); ?>"><button class="btn btn-primary"><i class="fa fa-edit "></i> Chỉnh Sửa</button>
-                                                                <a href="manage-authors.php?del=<?php echo htmlentities($result->id); ?>" onclick="return confirm('Bạn chắc chắn muốn xóa?');"" >  <button class=" btn btn-danger"><i class="fa fa-pencil"></i> Xóa</button>
+                                                            <img src="../admin/assets/img/<?php echo htmlentities($result->Image); ?>" alt="<?php echo htmlentities($result->BookName); ?>" style="width: 100px; height: auto;" />
+                                                        </td>
+                                                        <td class="center"><?php echo htmlentities($result->CategoryName); ?></td>
+                                                        <td class="center"><?php echo htmlentities($result->AuthorName); ?></td>
+                                                        <td class="center"><?php echo htmlentities($result->BookPrice); ?></td>
+                                                        <td class="center"><?php echo htmlentities($result->Stock); ?>/<?php echo htmlentities($result->Quantity);?></td>
+                                                        <td class="center">
+                                                            <?php if ($result->Method == 1) { ?>
+                                                                <a href="#" class="btn btn-success btn-xs">Online</a>
+                                                            <?php } else { ?>
+                                                                <a href="#" class="btn btn-danger btn-xs">Offline</a>
+                                                            <?php } ?>
+                                                        </td>
+                                                        <td class="center">
+                                                            <a href="edit-book.php?bookid=<?php echo htmlentities($result->bookid); ?>"><button class="btn btn-primary"><i class="fa fa-edit "></i> Sửa</button>
+                                                                <a href="manage-books.php?del=<?php echo htmlentities($result->bookid); ?>" onclick="return confirm('Bạn chắc chắn muốn xóa?');"> <button class=" btn btn-danger"><i class="fa fa-pencil"></i> Xóa</button>
                                                         </td>
                                                     </tr>
-                                            <?php $cnt = $cnt + 1;
+                                                <?php $cnt = $cnt + 1;
                                                 }
                                             } ?>
                                         </tbody>

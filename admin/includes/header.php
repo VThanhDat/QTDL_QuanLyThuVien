@@ -48,7 +48,7 @@
                                 <li role="presentation"><a role="menuitem" tabindex="-1" href="manage-books.php">quản lý sách</a></li>
                             </ul>
                         </li>
-
+                        <li><a href="reg-students.php">Quản lý tài khoản độc giả</a></li>
                         <li>
                             <a href="#" class="dropdown-toggle" id="ddlmenuItem" data-toggle="dropdown"> mượn trả sách <i class="fa fa-angle-down"></i></a>
                             <ul class="dropdown-menu" role="menu" aria-labelledby="ddlmenuItem">
@@ -56,7 +56,6 @@
                                 <li role="presentation"><a role="menuitem" tabindex="-1" href="manage-issued-books.php">quản lý mượn/trả sách</a></li>
                             </ul>
                         </li>
-                        <li><a href="reg-students.php">Quản lý tài khoản độc giả</a></li>
 
                         <li><a href="change-password.php">đổi mật khẩu admin</a></li>
                     </ul>

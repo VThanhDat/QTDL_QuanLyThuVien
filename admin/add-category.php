@@ -80,7 +80,6 @@ if (strlen($_SESSION['alogin']) == 0) {
                                             <input type="radio" name="status" id="status" value="0">Ẩn
                                         </label>
                                     </div>
-
                                 </div>
                                 <button type="submit" name="create" class="btn btn-info">Thêm </button>
                             </form>
