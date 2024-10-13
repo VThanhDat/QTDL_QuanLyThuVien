@@ -52,16 +52,15 @@
                         <li>
                             <a href="#" class="dropdown-toggle" id="ddlmenuItem" data-toggle="dropdown"> mượn trả sách <i class="fa fa-angle-down"></i></a>
                             <ul class="dropdown-menu" role="menu" aria-labelledby="ddlmenuItem">
-                                <li role="presentation"><a role="menuitem" tabindex="-1" href="issue-book.php">mượn sách</a></li>
-                                <li role="presentation"><a role="menuitem" tabindex="-1" href="manage-issued-books.php">quản lý mượn/trả sách</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="issue-book.php">mượn sách trực tiếp</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="manage-issued-books.php">quản lý mượn/trả sách trực tiếp</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="manage-issued-books-online.php">quản lý mượn/trả sách trực tuyến</a></li>
                             </ul>
                         </li>
-
                         <li><a href="change-password.php">đổi mật khẩu admin</a></li>
                     </ul>
                 </div>
             </div>
-
         </div>
     </div>
 </section>
