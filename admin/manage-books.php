@@ -131,7 +131,7 @@ if (strlen($_SESSION['alogin']) == 0) {
                                                     <td class="center"><?php echo htmlentities($cnt); ?></td>
                                                     <td class="center"><?php echo htmlentities($result->BookName); ?></td>
                                                     <td class="center">
-                                                        <img src="../admin/assets/img/<?php echo htmlentities($result->Image); ?>" alt="<?php echo htmlentities($result->BookName); ?>" style="width: 100px; height: auto;" />
+                                                        <img src="../admin/assets/img/<?php echo htmlentities($result->Image); ?>" alt="<?php echo htmlentities($result->BookName); ?>" style="width: 80px; height: 80px;" />
                                                     </td>
                                                     <td class="center"><?php echo htmlentities($result->CategoryName); ?></td>
                                                     <td class="center"><?php echo htmlentities($result->AuthorName); ?></td>

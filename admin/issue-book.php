@@ -165,7 +165,7 @@ if (strlen($_SESSION['alogin']) == 0) {
                                     </div>
                                     <div class="form-group">
                                         <label> Số lượng mượn<span style="color:red;">*</span></label>
-                                        <input class="form-control" type="number" name="quantityborrow" id="quantityborrow" min="1" required />
+                                        <input class="form-control" type="number" name="quantityborrow" id="quantityborrow" value="1" min="1" readonly required />
                                     </div>
                                     <button type="submit" name="issue" id="submit" class="btn btn-info">Mượn Sách</button>
                                 </form>

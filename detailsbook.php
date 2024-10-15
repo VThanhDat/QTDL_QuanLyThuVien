@@ -119,7 +119,7 @@ $book = $query->fetch(PDO::FETCH_OBJ);
                                 <!-- Tên sách -->
                                 <div class="form-group">
                                     <label>Tên sách<span style="color:red;">*</span></label>
-                                    <input class="form-control" type="text" name="bookname" value="<?php echo htmlentities($book->BookName); ?>" autocomplete="off" required />
+                                    <input class="form-control" type="text" name="bookname" value="<?php echo htmlentities($book->BookName); ?>" autocomplete="off" required readonly />
                                 </div>
 
                                 <!-- Thể loại sách -->
@@ -144,7 +144,7 @@ $book = $query->fetch(PDO::FETCH_OBJ);
                                 <!-- Số lượng -->
                                 <div class="form-group">
                                     <label>Số lượng<span style="color:red;">*</span></label>
-                                    <input class="form-control" type="number" name="quantity" value="1" min="1" required />
+                                    <input class="form-control" type="number" name="quantity" value="1" min="1" readonly required />
                                 </div>
 
 
