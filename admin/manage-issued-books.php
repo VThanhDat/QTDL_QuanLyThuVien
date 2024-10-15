@@ -9,15 +9,18 @@ if (strlen($_SESSION['alogin']) == 0) {
     if (isset($_GET['rid'])) {
         $rid = intval($_GET['rid']);
         $rstatus = 0;
-        $sql = "update ctmuontra set ReturnStatus=:rstatus where id=:rid";
+        $borrowstatus = 2;  
+        // Correct SQL update statement
+        $sql = "UPDATE ctmuontra SET ReturnStatus = :rstatus, BorrowStatus = :borrowstatus WHERE id = :rid";
         $query = $dbh->prepare($sql);
         $query->bindParam(':rid', $rid, PDO::PARAM_STR);
-        $query->bindParam(':rstatus', $rstatus, PDO::PARAM_STR);
-        $query->execute();
-
+        $query->bindParam(':rstatus', $rstatus, PDO::PARAM_STR);    
+        $query->bindParam(':borrowstatus', $borrowstatus, PDO::PARAM_STR);    
+        $query->execute();  
+    
         // Set the success message in the session
         $_SESSION['msg'] = "Đã trả sách thành công";
-
+    
         // Redirect to the same page to display the message
         header('location:manage-issued-books.php');
         exit(); // Make sure to stop script execution after redirection
@@ -114,11 +117,12 @@ if (strlen($_SESSION['alogin']) == 0) {
                                                 <th>Ngày mượn</th>
                                                 <th>Ngày trả</th>
                                                 <th>Số lượng</th>
+                                                <th>Trạng thái mượn</th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <?php $sql = "SELECT docgia.FullName, sach.BookName, sach.ISBNNumber,ctmuontra.QuantityBorrow,ctmuontra.Method, ctmuontra.IssuesDate, ctmuontra.ReturnDate, ctmuontra.ReturnStatus, ctmuontra.id as rid 
+                                            <?php $sql = "SELECT docgia.FullName,ctmuontra.BorrowStatus, sach.BookName, sach.ISBNNumber,ctmuontra.QuantityBorrow,ctmuontra.Method, ctmuontra.IssuesDate, ctmuontra.ReturnDate, ctmuontra.ReturnStatus, ctmuontra.id as rid 
                                                 FROM ctmuontra 
                                                 JOIN docgia ON docgia.id = ctmuontra.ReaderId 
                                                 JOIN sach ON sach.id = ctmuontra.BookId
@@ -144,6 +148,23 @@ if (strlen($_SESSION['alogin']) == 0) {
                                                                             ?></td>
                                                         <td class="center"><?php echo htmlentities($result->QuantityBorrow); ?></td>
                                                         <td class="center">
+                                                            <?php if ($result->BorrowStatus == '0') { ?>
+                                                                <a href="manage-issued-books-online.php?approve_id=<?php echo htmlentities($result->rid); ?>">
+                                                                    <button class="btn btn-success"><i class="fa fa-check "></i> Duyệt</button>
+                                                                </a>
+                                                                <a href="manage-issued-books-online.php?reject_id=<?php echo htmlentities($result->rid); ?>">
+                                                                    <button class="btn btn-warning"><i class="fa fa-times "></i> Từ chối</button>
+                                                                </a>
+                                                            <?php } elseif ($result->BorrowStatus == '1') { ?>
+                                                                <button class="btn btn-info" disabled><i class="fa fa-check "></i> Đã duyệt</button>
+                                                            <?php } elseif ($result->BorrowStatus == '2') { ?>
+                                                                <button class="btn btn-danger" disabled><i class="fa fa-times "></i> Đã trả</button>
+                                                            <?php } else { ?>
+                                                                <button class="btn btn-danger" disabled><i class="fa fa-times "></i> Từ chối</button>
+                                                            <?php } ?>
+                                                        </td>
+
+                                                        <td class="center">
                                                             <?php if ($result->ReturnStatus == 1) { ?>
                                                                 <a href="manage-issued-books.php?rid=<?php echo htmlentities($result->rid); ?>"><button class="btn btn-primary"><i class="fa fa-edit "></i> Trả Sách</button>
                                                                 <?php } else { ?>
@@ -157,7 +178,6 @@ if (strlen($_SESSION['alogin']) == 0) {
                                         </tbody>
                                     </table>
                                 </div>
-
                             </div>
                         </div>
                         <!--End Advanced Tables -->

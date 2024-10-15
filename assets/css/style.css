@@ -72,6 +72,38 @@ border: 1px solid black;
 }
 
 
+/* =============================================================
+   CARD IMAGE STYLES
+ ============================================================ */
+
+.card-img-top {
+    width: 100%;
+    height: 200px; /* Đặt chiều cao cố định */
+    object-fit: cover; /* Giúp hình ảnh được cắt để vừa khung */
+}
+
+.card {
+    margin-bottom: 20px; /* Khoảng cách giữa các thẻ card */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Hiệu ứng đổ bóng nhẹ */
+    border-radius: 8px; /* Bo tròn các góc */
+    overflow: hidden; /* Đảm bảo nội dung không vượt ra ngoài thẻ */
+}
+
+.card-body {
+    padding: 15px; /* Khoảng cách bên trong thẻ */
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border: none;
+    padding: 10px 20px;
+    font-size: 14px;
+    border-radius: 5px;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3; /* Màu khi hover */
+}
 
 /* =============================================================
    FOOTER SECTION STYLES

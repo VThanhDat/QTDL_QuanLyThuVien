@@ -17,59 +17,79 @@ if (isset($_POST['update'])) {
     $quantity = $_POST['quantity'];
     $method = $_POST['method'];
     $bookid = intval($_GET['bookid']);
-    
-    // Handle image upload
-    $target_dir = "F:/Github/QTDL_QuanLyThuVien/admin/assets/img/"; // Make sure this directory is writable
-    $imagePath = null; // Initialize image path variable
 
-    // Check if a new image file is uploaded
-    if (!empty($_FILES["book_image"]["name"])) {
-        $target_file = $target_dir . basename($_FILES["book_image"]["name"]);
-        $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+    // Step 1: Retrieve the current stock of the book
+    $sqlCurrentStock = "SELECT Stock FROM sach WHERE id=:bookid";
+    $queryCurrentStock = $dbh->prepare($sqlCurrentStock);
+    $queryCurrentStock->bindParam(':bookid', $bookid, PDO::PARAM_STR);
+    $queryCurrentStock->execute();
+    $currentStockResult = $queryCurrentStock->fetch(PDO::FETCH_OBJ);
 
-        // Check if file is an actual image
-        $check = getimagesize($_FILES["book_image"]["tmp_name"]);
-        if ($check === false) {
-            $_SESSION['msg'] = "Tệp đã chọn không phải là hình ảnh.";
+    // Check if the current stock exists
+    if ($currentStockResult) {
+        // Calculate the new stock after update
+        $newStock = $quantity - $currentStockResult->Stock;
+
+        // Check if the new stock would be less than 0
+        if ($newStock < 0) {
+            $_SESSION['msg'] = "Số lượng sách sửa đổi sẽ làm cho số lượng tồn kho trở về dưới 0.";
         } else {
-            // Allow certain file formats
-            if (!in_array($imageFileType, ['jpg', 'jpeg', 'png', 'gif'])) {
-                $_SESSION['msg'] = "Chỉ cho phép định dạng JPG, JPEG, PNG & GIF.";
-            } else {
-                if (move_uploaded_file($_FILES["book_image"]["tmp_name"], $target_file)) {
-                    $imagePath = basename($_FILES["book_image"]["name"]); // Store only the filename for the database
+            // Proceed with the image upload and update logic if the stock is valid
+            $target_dir = "F:/Github/QTDL_QuanLyThuVien/admin/assets/img/"; // Ensure this directory is writable
+            $imagePath = null; // Initialize image path variable
+
+            // Handle image upload
+            if (!empty($_FILES["book_image"]["name"])) {
+                $target_file = $target_dir . basename($_FILES["book_image"]["name"]);
+                $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+
+                // Check if file is an actual image
+                $check = getimagesize($_FILES["book_image"]["tmp_name"]);
+                if ($check === false) {
+                    $_SESSION['msg'] = "Tệp đã chọn không phải là hình ảnh.";
                 } else {
-                    $_SESSION['msg'] = "Lỗi trong việc tải lên hình ảnh.";
+                    // Allow certain file formats
+                    if (!in_array($imageFileType, ['jpg', 'jpeg', 'png', 'gif'])) {
+                        $_SESSION['msg'] = "Chỉ cho phép định dạng JPG, JPEG, PNG & GIF.";
+                    } else {
+                        if (move_uploaded_file($_FILES["book_image"]["tmp_name"], $target_file)) {
+                            $imagePath = basename($_FILES["book_image"]["name"]); // Store only the filename for the database
+                        } else {
+                            $_SESSION['msg'] = "Lỗi trong việc tải lên hình ảnh.";
+                        }
+                    }
                 }
             }
+
+            // Update book information including image path if a new image was uploaded
+            $sql = "UPDATE sach SET BookName=:bookname, CatId=:category, AuthorId=:author, ISBNNumber=:isbn, BookPrice=:price, Quantity=:quantity, Method=:method" . 
+                   ($imagePath ? ", Image=:image" : "") . 
+                   " WHERE id=:bookid";
+
+            $query = $dbh->prepare($sql);
+            $query->bindParam(':bookname', $bookname, PDO::PARAM_STR);
+            $query->bindParam(':category', $category, PDO::PARAM_STR);
+            $query->bindParam(':author', $author, PDO::PARAM_STR);
+            $query->bindParam(':isbn', $isbn, PDO::PARAM_STR);
+            $query->bindParam(':price', $price, PDO::PARAM_STR);
+            $query->bindParam(':quantity', $quantity, PDO::PARAM_STR);
+            $query->bindParam(':method', $method, PDO::PARAM_STR);
+            $query->bindParam(':bookid', $bookid, PDO::PARAM_STR);
+
+            // Bind image parameter only if a new image was uploaded
+            if ($imagePath) {
+                $query->bindParam(':image', $imagePath, PDO::PARAM_STR);
+            }
+
+            $query->execute();
+
+            $_SESSION['msg'] = "Cập nhật thông tin sách thành công";
+            header('location:manage-books.php');
+            exit();
         }
+    } else {
+        $_SESSION['msg'] = "Sách không tồn tại trong hệ thống.";
     }
-
-    // Update book information including image path if a new image was uploaded
-    $sql = "UPDATE sach SET BookName=:bookname, CatId=:category, AuthorId=:author, ISBNNumber=:isbn, BookPrice=:price, Quantity=:quantity, Method=:method" . 
-           ($imagePath ? ", Image=:image" : "") . 
-           " WHERE id=:bookid";
-
-    $query = $dbh->prepare($sql);
-    $query->bindParam(':bookname', $bookname, PDO::PARAM_STR);
-    $query->bindParam(':category', $category, PDO::PARAM_STR);
-    $query->bindParam(':author', $author, PDO::PARAM_STR);
-    $query->bindParam(':isbn', $isbn, PDO::PARAM_STR);
-    $query->bindParam(':price', $price, PDO::PARAM_STR);
-    $query->bindParam(':quantity', $quantity, PDO::PARAM_STR);
-    $query->bindParam(':method', $method, PDO::PARAM_STR);
-    $query->bindParam(':bookid', $bookid, PDO::PARAM_STR);
-
-    // Bind image parameter only if a new image was uploaded
-    if ($imagePath) {
-        $query->bindParam(':image', $imagePath, PDO::PARAM_STR);
-    }
-
-    $query->execute();
-
-    $_SESSION['msg'] = "Cập nhật thông tin sách thành công";
-    header('location:manage-books.php');
-    exit();
 }
 ?>
 

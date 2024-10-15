@@ -12,7 +12,21 @@ if (strlen($_SESSION['alogin']) == 0) {
         $bookid = $_POST['bookdetails'];
         $quantityborrow = $_POST['quantityborrow'];
 
-        // Kiểm tra xem độc giả đã mượn sách này mà chưa trả không
+        // Check the available stock of the book
+        $sqlStockCheck = "SELECT Stock FROM sach WHERE id = :bookid";
+        $queryStockCheck = $dbh->prepare($sqlStockCheck);
+        $queryStockCheck->bindParam(':bookid', $bookid, PDO::PARAM_STR);
+        $queryStockCheck->execute();
+        $book = $queryStockCheck->fetch(PDO::FETCH_OBJ);
+
+        // If no book is found or stock is insufficient
+        if (!$book || $quantityborrow > $book->Stock) {
+            $_SESSION['error'] = "Số lượng sách bạn mượn nhiều hơn số lượng sách trong kho.";
+            header('location:issue-book.php');
+            exit(); // Ensure that the code after this is not executed
+        }
+
+        // Check if the reader has already borrowed this book and has not returned it
         $sqlCheck = "SELECT * FROM ctmuontra WHERE ReaderId = :studentid AND BookId = :bookid AND ReturnStatus = 1";
         $queryCheck = $dbh->prepare($sqlCheck);
         $queryCheck->bindParam(':studentid', $studentid, PDO::PARAM_STR);
@@ -20,17 +34,19 @@ if (strlen($_SESSION['alogin']) == 0) {
         $queryCheck->execute();
 
         if ($queryCheck->rowCount() > 0) {
-            // Độc giả đã mượn sách này và chưa trả
+            // Reader has already borrowed this book and has not returned it
             $_SESSION['error'] = "Bạn đã mượn cuốn sách này và chưa trả.";
             header('location:issue-book.php');
-            exit(); // Đảm bảo rằng đoạn mã phía sau không được thực thi
+            exit(); // Ensure that the code after this is not executed
         } else {
-            // Tiến hành mượn sách
-            $sql = "INSERT INTO ctmuontra(ReaderId,BookId,QuantityBorrow,ReturnStatus,Method) VALUES(:studentid, :bookid, :quantityborrow, 1, 0)";
+            // Proceed with issuing the book
+            $sql = "INSERT INTO ctmuontra (ReaderId, BookId, QuantityBorrow, ReturnStatus, Method, BorrowStatus) 
+                    VALUES (:studentid, :bookid, :quantityborrow, 1, 0, 1)";
             $query = $dbh->prepare($sql);
             $query->bindParam(':studentid', $studentid, PDO::PARAM_STR);
             $query->bindParam(':bookid', $bookid, PDO::PARAM_STR);
             $query->bindParam(':quantityborrow', $quantityborrow, PDO::PARAM_STR);
+
             $query->execute();
             $lastInsertId = $dbh->lastInsertId();
 
@@ -45,6 +61,7 @@ if (strlen($_SESSION['alogin']) == 0) {
             }
         }
     }
+
 ?>
     <!DOCTYPE html>
     <html xmlns="http://www.w3.org/1999/xhtml">
@@ -54,7 +71,7 @@ if (strlen($_SESSION['alogin']) == 0) {
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
         <meta name="description" content="" />
         <meta name="author" content="" />
-        <title>Ouản Lý Thư Viện | Mượn Sách</title>
+        <title>Quản Lý Thư Viện | Mượn Sách</title>
         <!-- BOOTSTRAP CORE STYLE  -->
         <link href="assets/css/bootstrap.css" rel="stylesheet" />
         <!-- FONT AWESOME STYLE  -->
@@ -64,7 +81,7 @@ if (strlen($_SESSION['alogin']) == 0) {
         <!-- GOOGLE FONT -->
         <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css' />
         <script>
-            // function for get student name
+            // function for getting student name
             function getstudent() {
                 $("#loaderIcon").show();
                 jQuery.ajax({
@@ -75,11 +92,13 @@ if (strlen($_SESSION['alogin']) == 0) {
                         $("#get_student_name").html(data);
                         $("#loaderIcon").hide();
                     },
-                    error: function() {}
+                    error: function() {
+                        $("#loaderIcon").hide();
+                    }
                 });
             }
 
-            //function for book details
+            // function for book details
             function getbook() {
                 $("#loaderIcon").show();
                 jQuery.ajax({
@@ -90,7 +109,9 @@ if (strlen($_SESSION['alogin']) == 0) {
                         $("#get_book_name").html(data);
                         $("#loaderIcon").hide();
                     },
-                    error: function() {}
+                    error: function() {
+                        $("#loaderIcon").hide();
+                    }
                 });
             }
         </script>
@@ -99,12 +120,10 @@ if (strlen($_SESSION['alogin']) == 0) {
                 color: red;
             }
         </style>
-
-
     </head>
 
     <body>
-        <!------MENU SECTION START-->
+        <!-- MENU SECTION START-->
         <?php include('includes/header.php'); ?>
         <!-- MENU SECTION END-->
         <div class="content-wrapper">
@@ -114,22 +133,21 @@ if (strlen($_SESSION['alogin']) == 0) {
                         <h4 class="header-line">Mượn sách</h4>
                     </div>
                     <?php if ($_SESSION['error']) { ?>
-                            <div class="col-md-6">
-                                <div class="alert alert-danger">
-                                    <strong>Error:</strong> <?php echo htmlentities($_SESSION['error']); ?>
-                                    <?php $_SESSION['error'] = ""; ?>
-                                </div>
+                        <div class="col-md-6">
+                            <div class="alert alert-danger">
+                                <strong>Error:</strong> <?php echo htmlentities($_SESSION['error']); ?>
+                                <?php $_SESSION['error'] = ""; ?>
                             </div>
-                        <?php } ?>
+                        </div>
+                    <?php } ?>
                 </div>
                 <div class="row">
                     <div class="col-md-10 col-sm-6 col-xs-12 col-md-offset-1">
-                        <div class=" panel panel-info">
+                        <div class="panel panel-info">
                             <div class="panel-heading">
                                 Thông tin</div>
                             <div class="panel-body">
                                 <form role="form" method="post">
-    
                                     <div class="form-group">
                                         <label>Mã độc giả<span style="color:red;">*</span></label>
                                         <input class="form-control" type="text" name="studentid" id="studentid" onBlur="getstudent()" autocomplete="off" required />
@@ -137,23 +155,18 @@ if (strlen($_SESSION['alogin']) == 0) {
                                     <div class="form-group">
                                         <span id="get_student_name" style="font-size:16px;"></span>
                                     </div>
-    
                                     <div class="form-group">
                                         <label> Số ISBN hoặc Tên Sách<span style="color:red;">*</span></label>
                                         <input class="form-control" type="text" name="bookid" id="bookid" onBlur="getbook()" required="required" />
                                     </div>
-    
                                     <div class="form-group">
-                                        <select class="form-control" name="bookdetails" id="get_book_name" readonly>
+                                        <select class="form-control" name="bookdetails" id="get_book_name" required readonly>
                                         </select>
                                     </div>
-    
                                     <div class="form-group">
                                         <label> Số lượng mượn<span style="color:red;">*</span></label>
-                                        <input class="form-control" type="number" name="quantityborrow" id="quantityborrow" min="1" required="required" />
+                                        <input class="form-control" type="number" name="quantityborrow" id="quantityborrow" min="1" required />
                                     </div>
-    
-    
                                     <button type="submit" name="issue" id="submit" class="btn btn-info">Mượn Sách</button>
                                 </form>
                             </div>
@@ -166,13 +179,9 @@ if (strlen($_SESSION['alogin']) == 0) {
         <?php include('includes/footer.php'); ?>
         <!-- FOOTER SECTION END-->
         <!-- JAVASCRIPT FILES PLACED AT THE BOTTOM TO REDUCE THE LOADING TIME  -->
-        <!-- CORE JQUERY  -->
         <script src="assets/js/jquery-1.10.2.js"></script>
-        <!-- BOOTSTRAP SCRIPTS  -->
         <script src="assets/js/bootstrap.js"></script>
-        <!-- CUSTOM SCRIPTS  -->
         <script src="assets/js/custom.js"></script>
-
     </body>
 
     </html>

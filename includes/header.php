@@ -33,6 +33,8 @@
                     <ul id="menu-top" class="nav navbar-nav navbar-right">
                         <li><a href="dashboard.php" class="menu-top-active">TRANG CHỦ</a></li>
 
+                        <li><a href="booklist.php">SÁCH</a></li>
+
                         <li>
                             <a href="#" class="dropdown-toggle" id="ddlmenuItem" data-toggle="dropdown"> TÀI KHOẢN <i
                                     class="fa fa-angle-down"></i></a>
@@ -41,7 +43,7 @@
                                         của tôi</a></li>
                             </ul>
                         </li>
-                        <li><a href="issued-books.php">Sách Đã Mượn</a></li>
+                        <li><a href="issued-books.php">Sách Đã Mượn - Trả</a></li>
                     </ul>
                 </div>
             </div>

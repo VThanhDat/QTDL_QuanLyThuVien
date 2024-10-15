@@ -4,25 +4,113 @@ error_reporting(0);
 include('includes/config.php');
 if (strlen($_SESSION['alogin']) == 0) {
     header("location:../adminlogin.php");
-    exit(); // Thêm exit để đảm bảo ngừng thực thi mã sau khi chuyển hướng
+    exit();
 } else {
+    // Trả sách
     if (isset($_GET['rid'])) {
         $rid = intval($_GET['rid']);
         $rstatus = 0;
-        $sql = "update ctmuontra set ReturnStatus=:rstatus where id=:rid";
+        $borrowstatus = 2;
+        // Correct SQL update statement
+        $sql = "UPDATE ctmuontra SET ReturnStatus = :rstatus, BorrowStatus = :borrowstatus WHERE id = :rid";
         $query = $dbh->prepare($sql);
         $query->bindParam(':rid', $rid, PDO::PARAM_STR);
         $query->bindParam(':rstatus', $rstatus, PDO::PARAM_STR);
+        $query->bindParam(':borrowstatus', $borrowstatus, PDO::PARAM_STR);
         $query->execute();
 
         // Set the success message in the session
         $_SESSION['msg'] = "Đã trả sách thành công";
 
         // Redirect to the same page to display the message
-        header('location:manage-issued-books.php');
+        header('location:manage-issued-books-online.php');
         exit(); // Make sure to stop script execution after redirection
     }
+
+    // Xử lý duyệt mượn sách
+    if (isset($_GET['approve_id'])) {
+        $approve_id = intval($_GET['approve_id']);
+
+        // Retrieve the current stock of the book
+        $sqlStock = "SELECT Stock FROM sach WHERE id = (SELECT BookId FROM ctmuontra WHERE id = :approve_id)";
+        $queryStock = $dbh->prepare($sqlStock);
+        $queryStock->bindParam(':approve_id', $approve_id, PDO::PARAM_INT);
+        $queryStock->execute();
+        $currentStockResult = $queryStock->fetch(PDO::FETCH_OBJ);
+
+        // Retrieve the quantity borrowed
+        $sqlBorrowedQuantity = "SELECT QuantityBorrow FROM ctmuontra WHERE id = :approve_id";
+        $queryBorrowedQuantity = $dbh->prepare($sqlBorrowedQuantity);
+        $queryBorrowedQuantity->bindParam(':approve_id', $approve_id, PDO::PARAM_INT);
+        $queryBorrowedQuantity->execute();
+        $borrowedQuantityResult = $queryBorrowedQuantity->fetch(PDO::FETCH_OBJ);
+
+        if ($currentStockResult && $borrowedQuantityResult) {
+            $currentStock = $currentStockResult->Stock;
+            $borrowedQuantity = $borrowedQuantityResult->QuantityBorrow;
+
+            // Check if the borrowed quantity is less than or equal to the stock
+            if ($borrowedQuantity <= $currentStock) {
+                $borrowstatus = 1; // Trạng thái "Duyệt" mượn
+                $sql = "UPDATE ctmuontra SET BorrowStatus = :borrowstatus WHERE id = :approve_id";
+                $query = $dbh->prepare($sql);
+                $query->bindParam(':approve_id', $approve_id, PDO::PARAM_INT);
+                $query->bindParam(':borrowstatus', $borrowstatus, PDO::PARAM_INT);
+                $query->execute();
+
+                // Set success message
+                $_SESSION['msg'] = "Đã duyệt yêu cầu mượn sách thành công";
+            } else {
+                // Set error message if quantity exceeds stock
+                $_SESSION['error'] = "Số lượng sách mượn vượt quá số lượng còn trong kho.";
+            }
+        } else {
+            // Handle case where stock or borrowed quantity could not be fetched
+            $_SESSION['error'] = "Có lỗi xảy ra khi kiểm tra số lượng sách.";
+        }
+
+        // Redirect to the same page to display the message
+        header('location:manage-issued-books-online.php');
+        exit();
+    }
+
+
+    // Xử lý từ chối mượn sách
+    if (isset($_GET['reject_id'])) {
+        $reject_id = intval($_GET['reject_id']);
+        $borrowstatus = NULL; // Trạng thái từ chối (hoặc bạn có thể đặt giá trị khác)
+        $returnstatus = NULL; // Trạng thái từ chối (hoặc bạn có thể đặt giá trị khác)
+        $sql = "UPDATE ctmuontra SET BorrowStatus = :borrowstatus, ReturnStatus = :returnstatus  WHERE id = :reject_id";
+        $query = $dbh->prepare($sql);
+        $query->bindParam(':reject_id', $reject_id, PDO::PARAM_INT);
+        $query->bindParam(':borrowstatus', $borrowstatus, PDO::PARAM_NULL);
+        $query->bindParam(':returnstatus', $returnstatus, PDO::PARAM_NULL);
+        $query->execute();
+
+        // Set reject message
+        $_SESSION['msg'] = "Đã từ chối yêu cầu mượn sách";
+        header('location:manage-issued-books-online.php');
+        exit();
+    }
+
+    // Xử lý xóa yêu cầu mượn sách
+    if (isset($_GET['del'])) {
+        $del_id = intval($_GET['del']);
+        $sql = "DELETE FROM ctmuontra WHERE id = :del_id";
+        $query = $dbh->prepare($sql);
+        $query->bindParam(':del_id', $del_id, PDO::PARAM_INT);
+        if ($query->execute()) {
+            // Set delete message
+            $_SESSION['delmsg'] = "Yêu cầu mượn sách đã được xóa thành công";
+        } else {
+            // Set error message
+            $_SESSION['error'] = "Có lỗi xảy ra trong quá trình xóa yêu cầu mượn sách";
+        }
+        header('location:manage-issued-books-online.php');
+        exit();
+    }
 ?>
+
     <!DOCTYPE html>
     <html xmlns="http://www.w3.org/1999/xhtml">
 
@@ -114,11 +202,12 @@ if (strlen($_SESSION['alogin']) == 0) {
                                                 <th>Ngày mượn</th>
                                                 <th>Ngày trả</th>
                                                 <th>Số lượng</th>
+                                                <th>Trạng thái mượn</th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <?php $sql = "SELECT docgia.FullName, sach.BookName, sach.ISBNNumber,ctmuontra.QuantityBorrow,ctmuontra.Method, ctmuontra.IssuesDate, ctmuontra.ReturnDate, ctmuontra.ReturnStatus, ctmuontra.id as rid 
+                                            <?php $sql = "SELECT docgia.FullName,ctmuontra.BorrowStatus, sach.BookName, sach.ISBNNumber,ctmuontra.QuantityBorrow,ctmuontra.Method, ctmuontra.IssuesDate, ctmuontra.ReturnDate, ctmuontra.ReturnStatus, ctmuontra.id as rid 
                                                 FROM ctmuontra 
                                                 JOIN docgia ON docgia.id = ctmuontra.ReaderId 
                                                 JOIN sach ON sach.id = ctmuontra.BookId
@@ -144,12 +233,43 @@ if (strlen($_SESSION['alogin']) == 0) {
                                                                             ?></td>
                                                         <td class="center"><?php echo htmlentities($result->QuantityBorrow); ?></td>
                                                         <td class="center">
-                                                            <?php if ($result->ReturnStatus == 1) { ?>
-                                                                <a href="manage-issued-books.php?rid=<?php echo htmlentities($result->rid); ?>"><button class="btn btn-primary"><i class="fa fa-edit "></i> Trả Sách</button>
-                                                                <?php } else { ?>
-                                                                    <button class="btn btn-danger" disabled><i class="fa fa-edit "></i> Đã trả</button>
-                                                                <?php } ?>
+                                                            <?php if ($result->BorrowStatus == '0') { ?>
+                                                                <a href="manage-issued-books-online.php?approve_id=<?php echo htmlentities($result->rid); ?>">
+                                                                    <button class="btn btn-success"><i class="fa fa-check "></i> Duyệt</button>
+                                                                </a>
+                                                                <a href="manage-issued-books-online.php?reject_id=<?php echo htmlentities($result->rid); ?>">
+                                                                    <button class="btn btn-warning"><i class="fa fa-times "></i> Từ chối</button>
+                                                                </a>
+                                                            <?php } elseif ($result->BorrowStatus == '1') { ?>
+                                                                <button class="btn btn-info" disabled><i class="fa fa-check "></i> Đã duyệt</button>
+                                                            <?php } elseif ($result->BorrowStatus == '2') { ?>
+                                                                <button class="btn btn-danger" disabled><i class="fa fa-times "></i> Đã trả</button>
+                                                            <?php } else { ?>
+                                                                <button class="btn btn-danger" disabled><i class="fa fa-times "></i> Từ chối</button>
+                                                            <?php } ?>
                                                         </td>
+
+
+                                                        <td class="center">
+                                                            <?php if ($result->BorrowStatus == '0') { ?>
+                                                                <!-- Do not display any action buttons when status is 0 -->
+                                                                <button class="btn btn-secondary" disabled></button>
+                                                            <?php } elseif ($result->BorrowStatus == '1') { ?>
+                                                                <!-- Show the return book button when status is 1 -->
+                                                                <a href="manage-issued-books-online.php?rid=<?php echo htmlentities($result->rid); ?>">
+                                                                    <button class="btn btn-primary"><i class="fa fa-edit "></i> Trả Sách</button>
+                                                                </a>
+                                                            <?php } elseif ($result->BorrowStatus == '2') { ?>
+                                                                <!-- Show a disabled button when status is 2 (returned) -->
+                                                                <button class="btn btn-danger" disabled><i class="fa fa-times "></i> Đã trả</button>
+                                                            <?php } elseif ($result->BorrowStatus === NULL) { ?>
+                                                                <!-- Show delete button when status is NULL (rejected) -->
+                                                                <a href="manage-issued-books-online.php?del=<?php echo htmlentities($result->rid); ?>">
+                                                                    <button class="btn btn-danger"><i class="fa fa-trash "></i> Xóa</button>
+                                                                </a>
+                                                            <?php } ?>
+                                                        </td>
+
                                                     </tr>
                                             <?php $cnt = $cnt + 1;
                                                 }
@@ -157,7 +277,6 @@ if (strlen($_SESSION['alogin']) == 0) {
                                         </tbody>
                                     </table>
                                 </div>
-
                             </div>
                         </div>
                         <!--End Advanced Tables -->
