@@ -3,27 +3,14 @@ session_start();
 
 include('includes/config.php');
 if (strlen($_SESSION['alogin']) == 0) {
-    header("location:../adminlogin.php"); 
+    header("location:../adminlogin.php");
     exit(); // Thêm exit để đảm bảo ngừng thực thi mã sau khi chuyển hướng
-} 
+}
 
 if (isset($_POST['create'])) {
     $author = $_POST['author'];
-
-    // Kiểm tra xem tác giả đã tồn tại chưa
-    $sql_check = "SELECT * FROM tacgia WHERE AuthorName = :author";
-    $query_check = $dbh->prepare($sql_check);
-    $query_check->bindParam(':author', $author, PDO::PARAM_STR);
-    $query_check->execute();
-    $result_check = $query_check->fetch(PDO::FETCH_ASSOC);
-
-    if ($result_check) {
-        // Nếu tác giả đã tồn tại
-        $_SESSION['error'] = "Tên Tác Giả đã tồn tại";
-        header('location:manage-authors.php');
-        exit(); // Ngừng thực thi sau khi chuyển hướng
-    } else {
-        // Thêm tác giả mới vào cơ sở dữ liệu
+    // Thêm tác giả mới vào cơ sở dữ liệu
+    try {
         $sql = "INSERT INTO tacgia (AuthorName) VALUES (:author)";
         $query = $dbh->prepare($sql);
         $query->bindParam(':author', $author, PDO::PARAM_STR);
@@ -37,6 +24,13 @@ if (isset($_POST['create'])) {
         }
         header('location:manage-authors.php');
         exit(); // Dừng thực thi mã sau khi chuyển hướng
+    } catch (PDOException $e) {
+        // Kiểm tra lỗi nếu trigger bắt lỗi tên thể loại đã tồn tại
+        if (strpos($e->getMessage(), 'Tên tác giả đã tồn tại') !== false) {
+            $_SESSION['error'] = "Tên tác giả đã tồn tại. Vui lòng chọn tên khác.";
+        } else {
+            $_SESSION['error'] = "Có lỗi xảy ra, vui lòng thử lại !!!";
+        }
     }
 }
 ?>
@@ -70,6 +64,16 @@ if (isset($_POST['create'])) {
             <div class="row pad-botm">
                 <div class="col-md-12">
                     <h4 class="header-line">Thêm Tác Giả</h4>
+                </div>
+                <div class="row">
+                    <?php if ($_SESSION['error']) { ?>
+                        <div class="col-md-6">
+                            <div class="alert alert-danger">
+                                <strong>Error:</strong> <?php echo htmlentities($_SESSION['error']); ?>
+                                <?php $_SESSION['error'] = ""; ?>
+                            </div>
+                        </div>
+                    <?php } ?>
                 </div>
             </div>
 
