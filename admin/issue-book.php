@@ -27,7 +27,7 @@ if (strlen($_SESSION['alogin']) == 0) {
         }
 
         // Check if the reader has already borrowed this book and has not returned it
-        $sqlCheck = "SELECT * FROM ctmuontra WHERE ReaderId = :studentid AND BookId = :bookid AND ReturnStatus = 1";
+        $sqlCheck = "SELECT * FROM ctmuontra WHERE ReaderId = :studentid AND BookId = :bookid AND (BorrowStatus = 1 OR BorrowStatus = 0)";
         $queryCheck = $dbh->prepare($sqlCheck);
         $queryCheck->bindParam(':studentid', $studentid, PDO::PARAM_STR);
         $queryCheck->bindParam(':bookid', $bookid, PDO::PARAM_STR);
@@ -40,8 +40,8 @@ if (strlen($_SESSION['alogin']) == 0) {
             exit(); // Ensure that the code after this is not executed
         } else {
             // Proceed with issuing the book
-            $sql = "INSERT INTO ctmuontra (ReaderId, BookId, QuantityBorrow, ReturnStatus, Method, BorrowStatus) 
-                    VALUES (:studentid, :bookid, :quantityborrow, 1, 0, 1)";
+            $sql = "INSERT INTO ctmuontra (ReaderId, BookId, QuantityBorrow, Method, BorrowStatus) 
+                    VALUES (:studentid, :bookid, :quantityborrow, 0, 1)";
             $query = $dbh->prepare($sql);
             $query->bindParam(':studentid', $studentid, PDO::PARAM_STR);
             $query->bindParam(':bookid', $bookid, PDO::PARAM_STR);

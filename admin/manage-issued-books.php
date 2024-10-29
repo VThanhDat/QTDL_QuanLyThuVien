@@ -8,13 +8,11 @@ if (strlen($_SESSION['alogin']) == 0) {
 } else {
     if (isset($_GET['rid'])) {
         $rid = intval($_GET['rid']);
-        $rstatus = 0;
         $borrowstatus = 2;  
         // Correct SQL update statement
-        $sql = "UPDATE ctmuontra SET ReturnStatus = :rstatus, BorrowStatus = :borrowstatus WHERE id = :rid";
+        $sql = "UPDATE ctmuontra SET BorrowStatus = :borrowstatus WHERE id = :rid";
         $query = $dbh->prepare($sql);
         $query->bindParam(':rid', $rid, PDO::PARAM_STR);
-        $query->bindParam(':rstatus', $rstatus, PDO::PARAM_STR);    
         $query->bindParam(':borrowstatus', $borrowstatus, PDO::PARAM_STR);    
         $query->execute();  
     
@@ -122,7 +120,7 @@ if (strlen($_SESSION['alogin']) == 0) {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <?php $sql = "SELECT docgia.FullName,ctmuontra.BorrowStatus, sach.BookName, sach.ISBNNumber,ctmuontra.QuantityBorrow,ctmuontra.Method, ctmuontra.IssuesDate, ctmuontra.ReturnDate, ctmuontra.ReturnStatus, ctmuontra.id as rid 
+                                            <?php $sql = "SELECT docgia.FullName,ctmuontra.BorrowStatus, sach.BookName, sach.ISBNNumber,ctmuontra.QuantityBorrow,ctmuontra.Method, ctmuontra.IssuesDate, ctmuontra.ReturnDate, ctmuontra.id as rid 
                                                 FROM ctmuontra 
                                                 JOIN docgia ON docgia.id = ctmuontra.ReaderId 
                                                 JOIN sach ON sach.id = ctmuontra.BookId
@@ -165,7 +163,7 @@ if (strlen($_SESSION['alogin']) == 0) {
                                                         </td>
 
                                                         <td class="center">
-                                                            <?php if ($result->ReturnStatus == 1) { ?>
+                                                            <?php if ($result->BorrowStatus == '1') { ?>
                                                                 <a href="manage-issued-books.php?rid=<?php echo htmlentities($result->rid); ?>"><button class="btn btn-primary"><i class="fa fa-edit "></i> Trả Sách</button>
                                                                 <?php } else { ?>
                                                                     <button class="btn btn-danger" disabled><i class="fa fa-edit "></i> Đã trả</button>

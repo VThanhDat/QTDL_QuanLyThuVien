@@ -9,23 +9,58 @@ if (strlen($_SESSION['alogin']) == 0) {
     // Trả sách
     if (isset($_GET['rid'])) {
         $rid = intval($_GET['rid']);
-        $rstatus = 0;
-        $borrowstatus = 2;
-        // Correct SQL update statement
-        $sql = "UPDATE ctmuontra SET ReturnStatus = :rstatus, BorrowStatus = :borrowstatus WHERE id = :rid";
-        $query = $dbh->prepare($sql);
-        $query->bindParam(':rid', $rid, PDO::PARAM_STR);
-        $query->bindParam(':rstatus', $rstatus, PDO::PARAM_STR);
-        $query->bindParam(':borrowstatus', $borrowstatus, PDO::PARAM_STR);
-        $query->execute();
 
-        // Set the success message in the session
-        $_SESSION['msg'] = "Đã trả sách thành công";
+        // Retrieve the quantity borrowed and book ID
+        $sqlBorrowedQuantity = "SELECT QuantityBorrow, BookId FROM ctmuontra WHERE id = :rid";
+        $queryBorrowedQuantity = $dbh->prepare($sqlBorrowedQuantity);
+        $queryBorrowedQuantity->bindParam(':rid', $rid, PDO::PARAM_INT);
+        $queryBorrowedQuantity->execute();
+        $borrowedQuantityResult = $queryBorrowedQuantity->fetch(PDO::FETCH_OBJ);
+
+        if ($borrowedQuantityResult) {
+            $borrowedQuantity = $borrowedQuantityResult->QuantityBorrow;
+            $bookId = $borrowedQuantityResult->BookId;
+
+            // Retrieve the current stock of the book
+            $sqlStock = "SELECT Stock FROM sach WHERE id = :bookId";
+            $queryStock = $dbh->prepare($sqlStock);
+            $queryStock->bindParam(':bookId', $bookId, PDO::PARAM_INT);
+            $queryStock->execute();
+            $currentStockResult = $queryStock->fetch(PDO::FETCH_OBJ);
+
+            if ($currentStockResult) {
+                $currentStock = $currentStockResult->Stock;
+
+                // Update the stock after returning
+                $newStock = $currentStock + $borrowedQuantity; // Increase stock by borrowed quantity
+                $sqlUpdateStock = "UPDATE sach SET Stock = :newStock WHERE id = :bookId";
+                $queryUpdateStock = $dbh->prepare($sqlUpdateStock);
+                $queryUpdateStock->bindParam(':newStock', $newStock, PDO::PARAM_INT);
+                $queryUpdateStock->bindParam(':bookId', $bookId, PDO::PARAM_INT);
+                $queryUpdateStock->execute(); // Update stock in sach table
+
+                // Update borrow status
+                $borrowstatus = 2; // Status for returned
+                $sql = "UPDATE ctmuontra SET BorrowStatus = :borrowstatus WHERE id = :rid";
+                $query = $dbh->prepare($sql);
+                $query->bindParam(':rid', $rid, PDO::PARAM_STR);
+                $query->bindParam(':borrowstatus', $borrowstatus, PDO::PARAM_STR);
+                $query->execute();
+
+                // Set the success message in the session
+                $_SESSION['msg'] = "Đã trả sách thành công";
+            } else {
+                $_SESSION['error'] = "Có lỗi xảy ra khi kiểm tra số lượng sách.";
+            }
+        } else {
+            $_SESSION['error'] = "Có lỗi xảy ra khi lấy thông tin mượn sách.";
+        }
 
         // Redirect to the same page to display the message
         header('location:manage-issued-books-online.php');
         exit(); // Make sure to stop script execution after redirection
     }
+
 
     // Xử lý duyệt mượn sách
     if (isset($_GET['approve_id'])) {
@@ -51,6 +86,15 @@ if (strlen($_SESSION['alogin']) == 0) {
 
             // Check if the borrowed quantity is less than or equal to the stock
             if ($borrowedQuantity <= $currentStock) {
+                // Update the stock after approval
+                $newStock = $currentStock - $borrowedQuantity; // Calculate new stock
+                $sqlUpdateStock = "UPDATE sach SET Stock = :newStock WHERE id = (SELECT BookId FROM ctmuontra WHERE id = :approve_id)";
+                $queryUpdateStock = $dbh->prepare($sqlUpdateStock);
+                $queryUpdateStock->bindParam(':newStock', $newStock, PDO::PARAM_INT);
+                $queryUpdateStock->bindParam(':approve_id', $approve_id, PDO::PARAM_INT);
+                $queryUpdateStock->execute(); // Update stock in sach table
+
+                // Update borrow status
                 $borrowstatus = 1; // Trạng thái "Duyệt" mượn
                 $sql = "UPDATE ctmuontra SET BorrowStatus = :borrowstatus WHERE id = :approve_id";
                 $query = $dbh->prepare($sql);
@@ -75,16 +119,15 @@ if (strlen($_SESSION['alogin']) == 0) {
     }
 
 
+
     // Xử lý từ chối mượn sách
     if (isset($_GET['reject_id'])) {
         $reject_id = intval($_GET['reject_id']);
         $borrowstatus = NULL; // Trạng thái từ chối (hoặc bạn có thể đặt giá trị khác)
-        $returnstatus = NULL; // Trạng thái từ chối (hoặc bạn có thể đặt giá trị khác)
-        $sql = "UPDATE ctmuontra SET BorrowStatus = :borrowstatus, ReturnStatus = :returnstatus  WHERE id = :reject_id";
+        $sql = "UPDATE ctmuontra SET BorrowStatus = :borrowstatus WHERE id = :reject_id";
         $query = $dbh->prepare($sql);
         $query->bindParam(':reject_id', $reject_id, PDO::PARAM_INT);
         $query->bindParam(':borrowstatus', $borrowstatus, PDO::PARAM_NULL);
-        $query->bindParam(':returnstatus', $returnstatus, PDO::PARAM_NULL);
         $query->execute();
 
         // Set reject message
@@ -207,7 +250,7 @@ if (strlen($_SESSION['alogin']) == 0) {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <?php $sql = "SELECT docgia.FullName,ctmuontra.BorrowStatus, sach.BookName, sach.ISBNNumber,ctmuontra.QuantityBorrow,ctmuontra.Method, ctmuontra.IssuesDate, ctmuontra.ReturnDate, ctmuontra.ReturnStatus, ctmuontra.id as rid 
+                                            <?php $sql = "SELECT docgia.FullName,ctmuontra.BorrowStatus, sach.BookName, sach.ISBNNumber,ctmuontra.QuantityBorrow,ctmuontra.Method, ctmuontra.IssuesDate, ctmuontra.ReturnDate, ctmuontra.id as rid 
                                                 FROM ctmuontra 
                                                 JOIN docgia ON docgia.id = ctmuontra.ReaderId 
                                                 JOIN sach ON sach.id = ctmuontra.BookId

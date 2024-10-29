@@ -10,7 +10,7 @@ if (strlen($_SESSION['login']) == 0) {
     if (isset($_GET['deleteid'])) {
         $id = intval($_GET['deleteid']); // Lấy ID của bản ghi cần xóa
         // Thực hiện câu lệnh SQL để update ReturnStatus và BorrowStatus về NULL
-        $sql = "UPDATE ctmuontra SET ReturnStatus = NULL, BorrowStatus = NULL WHERE id = :id";
+        $sql = "UPDATE ctmuontra SET BorrowStatus = NULL WHERE id = :id";
         $query = $dbh->prepare($sql);
         $query->bindParam(':id', $id, PDO::PARAM_INT);
         $query->execute();
@@ -78,8 +78,7 @@ if (strlen($_SESSION['login']) == 0) {
                                         ctmuontra.IssuesDate AS ngay_muon, 
                                         ctmuontra.ReturnDate AS ngay_tra,
                                         ctmuontra.QuantityBorrow,ctmuontra.Method,
-                                        ctmuontra.BorrowStatus,
-                                        ctmuontra.ReturnStatus
+                                        ctmuontra.BorrowStatus
                                         FROM ctmuontra JOIN sach ON ctmuontra.BookId = sach.id WHERE ctmuontra.ReaderId =:sid";
                                         $stmt = $dbh->prepare($sql);
                                         $stmt->bindParam(':sid', $sid, PDO::PARAM_STR);
@@ -116,7 +115,7 @@ if (strlen($_SESSION['login']) == 0) {
                                                         echo '<a href="#" class="btn btn-warning btn-xs">Chưa duyệt</a>';
                                                         echo ' <a href="issued-books.php?deleteid=' . htmlentities($result->id) . '" class="btn btn-danger btn-xs" onclick="return confirm(\'Bạn có chắc chắn muốn xóa yêu cầu này không?\');">Xóa</a>';
                                                     } elseif ($result->BorrowStatus == '1') {
-                                                        if ($result->Method == 1 && $result->ReturnStatus == 1) {
+                                                        if ($result->Method == 1) {
                                                             echo '<a href="#" class="btn btn-success btn-xs">Đã duyệt</a> ';
                                                         } else {
                                                             echo '<a href="#" class="btn btn-success btn-xs">Đã duyệt</a>'; // Nút màu xanh cho "Đã duyệt"
@@ -130,10 +129,6 @@ if (strlen($_SESSION['login']) == 0) {
                                                     }
                                                     ?>
                                                 </td>
-
-
-
-
                                             </tr>
                                         <?php $cnt = $cnt + 1;
                                         } ?>

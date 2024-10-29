@@ -18,7 +18,7 @@ if (isset($_POST['borrow'])) {
     $sid = $_SESSION['stdid'];
 
     // Kiểm tra xem người dùng đã mượn sách này chưa
-    $checkSql = "SELECT * FROM ctmuontra WHERE ReaderId = :sid AND BookId = :bookid AND ReturnStatus = 1";
+    $checkSql = "SELECT * FROM ctmuontra WHERE ReaderId = :sid AND BookId = :bookid AND BorrowStatus = 0";
     $checkQuery = $dbh->prepare($checkSql);
     $checkQuery->bindParam(':sid', $sid, PDO::PARAM_STR);
     $checkQuery->bindParam(':bookid', $book_id, PDO::PARAM_INT);
@@ -47,8 +47,8 @@ if (isset($_POST['borrow'])) {
             $issuesdate->setTime(date('H'), date('i'), date('s')); // Thêm thời gian hiện tại (giờ, phút, giây)
 
             // Thêm thông tin mượn sách vào bảng ctmuontra
-            $sql = "INSERT INTO ctmuontra (ReaderId, BookId, QuantityBorrow, IssuesDate, ReturnDate, ReturnStatus, Method, BorrowStatus) 
-                    VALUES (:sid, :bookid, :quantityborrow, :issuesdate, :returndate, 1, 1, 0)";
+            $sql = "INSERT INTO ctmuontra (ReaderId, BookId, QuantityBorrow, IssuesDate, ReturnDate, Method, BorrowStatus) 
+                    VALUES (:sid, :bookid, :quantityborrow, :issuesdate, :returndate, 1, 0)";
             $query = $dbh->prepare($sql);
             $query->bindParam(':sid', $sid, PDO::PARAM_STR);
             $query->bindParam(':bookid', $book_id, PDO::PARAM_INT);
@@ -57,11 +57,11 @@ if (isset($_POST['borrow'])) {
             $query->bindParam(':returndate', $returndate->format('Y-m-d H:i:s'), PDO::PARAM_STR); // Định dạng ngày trả
 
             if ($query->execute()) {
-                $_SESSION['msg'] = "Mượn sách thành công!";
+                echo "<script>alert('Mượn sách thành công');</script>";
                 header('location:booklist.php');
                 exit();
             } else {
-                $_SESSION['error'] = "Có lỗi xảy ra, vui lòng thử lại!";
+                echo "<script>alert('Có lỗi xảy ra, vui lòng thử lại!');</script>";
                 header('location:booklist.php');
                 exit();
             }
