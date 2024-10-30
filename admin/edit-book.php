@@ -35,7 +35,7 @@ if (isset($_POST['update'])) {
             $_SESSION['msg'] = "Số lượng sách sửa đổi sẽ làm cho số lượng tồn kho trở về dưới 0.";
         } else {
             // Proceed with the image upload and update logic if the stock is valid
-            $target_dir = "F:/Github/QTDL_QuanLyThuVien/admin/assets/img/"; // Ensure this directory is writable
+            $target_dir = __DIR__ . "/assets/img/";
             $imagePath = null; // Initialize image path variable
 
             // Handle image upload
