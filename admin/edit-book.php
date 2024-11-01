@@ -4,7 +4,7 @@ error_reporting(0);
 include('includes/config.php');
 
 if (strlen($_SESSION['alogin']) == 0) {
-    header("location:../adminlogin.php"); 
+    header("location:../adminlogin.php");
     exit(); // Ensure to stop executing code after redirection
 }
 
@@ -35,25 +35,35 @@ if (isset($_POST['update'])) {
             $_SESSION['msg'] = "Số lượng sách sửa đổi sẽ làm cho số lượng tồn kho trở về dưới 0.";
         } else {
             // Proceed with the image upload and update logic if the stock is valid
-            $target_dir = "F:/Github/QTDL_QuanLyThuVien/admin/assets/img/"; // Ensure this directory is writable
+            $target_dir = __DIR__ . "/assets/img/"; // Ensure this directory is writable
             $imagePath = null; // Initialize image path variable
 
             // Handle image upload
+            // Kiểm tra nếu có tệp hình ảnh được tải lên
             if (!empty($_FILES["book_image"]["name"])) {
                 $target_file = $target_dir . basename($_FILES["book_image"]["name"]);
                 $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
 
-                // Check if file is an actual image
+                // Kiểm tra xem tệp có phải là hình ảnh không
                 $check = getimagesize($_FILES["book_image"]["tmp_name"]);
                 if ($check === false) {
                     $_SESSION['msg'] = "Tệp đã chọn không phải là hình ảnh.";
                 } else {
-                    // Allow certain file formats
-                    if (!in_array($imageFileType, ['jpg', 'jpeg', 'png', 'gif'])) {
+                    // Cho phép các định dạng tệp cụ thể
+                    if (!in_array(
+                        $imageFileType,
+                        ['jpg', 'jpeg', 'png', 'gif', 'webp']
+                    )) {
                         $_SESSION['msg'] = "Chỉ cho phép định dạng JPG, JPEG, PNG & GIF.";
                     } else {
+                        // Di chuyển tệp đến thư mục đích
                         if (move_uploaded_file($_FILES["book_image"]["tmp_name"], $target_file)) {
-                            $imagePath = basename($_FILES["book_image"]["name"]); // Store only the filename for the database
+                            $imagePath = basename($_FILES["book_image"]["name"]); // Lưu trữ chỉ tên tệp cho cơ sở dữ liệu
+
+                            // Nếu có hình ảnh cũ, xóa nó
+                            if (!empty($result->Image) && file_exists($target_dir . $result->Image)) {
+                                unlink($target_dir . $result->Image); // Xóa hình ảnh cũ
+                            }
                         } else {
                             $_SESSION['msg'] = "Lỗi trong việc tải lên hình ảnh.";
                         }
@@ -61,10 +71,11 @@ if (isset($_POST['update'])) {
                 }
             }
 
+
             // Update book information including image path if a new image was uploaded
-            $sql = "UPDATE sach SET BookName=:bookname, CatId=:category, AuthorId=:author, ISBNNumber=:isbn, BookPrice=:price, Quantity=:quantity, Method=:method" . 
-                   ($imagePath ? ", Image=:image" : "") . 
-                   " WHERE id=:bookid";
+            $sql = "UPDATE sach SET BookName=:bookname, CatId=:category, AuthorId=:author, ISBNNumber=:isbn, BookPrice=:price, Quantity=:quantity, Method=:method" .
+                ($imagePath ? ", Image=:image" : "") .
+                " WHERE id=:bookid";
 
             $query = $dbh->prepare($sql);
             $query->bindParam(':bookname', $bookname, PDO::PARAM_STR);
@@ -95,6 +106,7 @@ if (isset($_POST['update'])) {
 
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
@@ -106,6 +118,7 @@ if (isset($_POST['update'])) {
     <link href="assets/css/style.css" rel="stylesheet" />
     <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css' />
 </head>
+
 <body>
     <?php include('includes/header.php'); ?>
 
@@ -202,7 +215,7 @@ if (isset($_POST['update'])) {
                                         </div>
 
                                         <div class="form-group">
-                                            <label>Số  lượng<span style="color:red;">*</span></label>
+                                            <label>Số lượng<span style="color:red;">*</span></label>
                                             <input class="form-control" type="number" name="quantity" value="<?php echo htmlentities($result->Quantity); ?>" min="0" required />
                                         </div>
 
@@ -229,14 +242,15 @@ if (isset($_POST['update'])) {
                                             <input type="file" name="book_image" />
                                             <p class="help-block">Chọn hình ảnh bìa sách (nếu có)</p>
                                         </div>
-                                        
+
 
                                 <?php }
                                 } ?>
                                 <button type="submit" name="update" class="btn btn-info">Cập nhật</button>
                                 <button type="button" class="btn btn-danger" onclick="window.location.href='manage-books.php'">Quay lại</button>
                             </form>
-                            <div style="color:red;"><?php echo htmlentities($_SESSION['msg']); $_SESSION['msg'] = ""; ?></div>
+                            <div style="color:red;"><?php echo htmlentities($_SESSION['msg']);
+                                                    $_SESSION['msg'] = ""; ?></div>
                         </div>
                     </div>
                 </div>
@@ -248,4 +262,5 @@ if (isset($_POST['update'])) {
     <script src="assets/js/jquery-1.10.2.js"></script>
     <script src="assets/js/bootstrap.js"></script>
 </body>
+
 </html>

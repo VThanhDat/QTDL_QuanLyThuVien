@@ -6,12 +6,12 @@ if (!empty($_POST["bookid"])) {
     // Modify the query to use LIKE for both ISBNNumber and BookName
     $sql = "SELECT BookName, id FROM sach WHERE ISBNNumber LIKE :bookid OR BookName LIKE :bookidlike";
     $query = $dbh->prepare($sql);
-    
+
     // Use LIKE for both ISBNNumber and BookName
     $bookidlike = "%" . $bookid . "%";
     $query->bindParam(':bookid', $bookidlike, PDO::PARAM_STR); // Use LIKE for ISBNNumber
     $query->bindParam(':bookidlike', $bookidlike, PDO::PARAM_STR); // Use LIKE for BookName
-    
+
     $query->execute();
     $results = $query->fetchAll(PDO::FETCH_OBJ);
 

@@ -14,12 +14,11 @@ if (strlen($_SESSION['login']) == 0) {
         $query = $dbh->prepare($sql);
         $query->bindParam(':id', $id, PDO::PARAM_INT);
         $query->execute();
-    
+
         $_SESSION['delmsg'] = "Yêu cầu đã được xóa thành công"; // Thông báo xóa thành công
         header('location:issued-books.php'); // Chuyển hướng về trang danh sách sách
         exit();
     }
-    
 }
 
 ?>
@@ -38,6 +37,7 @@ if (strlen($_SESSION['login']) == 0) {
     <link href="assets/js/dataTables/dataTables.bootstrap.css" rel="stylesheet" />
     <link href="assets/css/style.css" rel="stylesheet" />
     <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css' />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 
 <body>
@@ -46,7 +46,9 @@ if (strlen($_SESSION['login']) == 0) {
         <div class="container">
             <div class="row pad-botm">
                 <div class="col-md-12">
-                    <h4 class="header-line">Sách đã mượn</h4>
+                    <h4 class="header-line">
+                        <i class="fas fa-warehouse" style="margin-right: 10px;"></i> SÁCH ĐÃ MƯỢN
+                    </h4>
                 </div>
             </div>
             <div class="row">
@@ -60,14 +62,14 @@ if (strlen($_SESSION['login']) == 0) {
                                 <table class="table table-striped table-bordered table-hover" id="dataTables-example">
                                     <thead>
                                         <tr>
-                                            <th>STT</th>
-                                            <th>Tên Sách</th>
-                                            <th>Mã ISBN</th>
-                                            <th>Ngày mượn</th>
-                                            <th>Ngày trả</th>
-                                            <th>Số lượng</th>
-                                            <th>Hình thức</th>
-                                            <th>Trạng thái</th>
+                                            <th style="vertical-align: middle;">STT</th>
+                                            <th style="vertical-align: middle;">Tên Sách</th>
+                                            <th style="vertical-align: middle;">Mã ISBN</th>
+                                            <th style="vertical-align: middle;">Ngày mượn</th>
+                                            <th style="vertical-align: middle;">Ngày trả</th>
+                                            <th style="vertical-align: middle;">Số lượng</th>
+                                            <th style="vertical-align: middle;">Hình thức</th>
+                                            <th style="vertical-align: middle;">Trạng thái</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -87,11 +89,11 @@ if (strlen($_SESSION['login']) == 0) {
                                         $cnt = 1;
                                         foreach ($results as $result) { ?>
                                             <tr class="odd gradeX">
-                                                <td class="center"><?php echo htmlentities($cnt); ?></td>
-                                                <td class="center"><?php echo htmlentities($result->ten_sach); ?></td>
-                                                <td class="center"><?php echo htmlentities($result->ma_isbn); ?></td>
-                                                <td class="center"><?php echo htmlentities($result->ngay_muon); ?></td>
-                                                <td class="center">
+                                                <td class="center" style="vertical-align: middle;"><?php echo htmlentities($cnt); ?></td>
+                                                <td class="center" style="vertical-align: middle;"><?php echo htmlentities($result->ten_sach); ?></td>
+                                                <td class="center" style="vertical-align: middle;"><?php echo htmlentities($result->ma_isbn); ?></td>
+                                                <td class="center" style="vertical-align: middle;"><?php echo htmlentities($result->ngay_muon); ?></td>
+                                                <td class="center" style="vertical-align: middle;">
                                                     <?php
                                                     if ($result->ngay_tra == "") {
                                                         echo "<span style='color:red'>Chưa Trả</span>";
@@ -100,34 +102,31 @@ if (strlen($_SESSION['login']) == 0) {
                                                     }
                                                     ?>
                                                 </td>
-                                                <td class="center"><?php echo htmlentities($result->QuantityBorrow); ?></td>
-                                                <td class="center"><?php if ($result->Method == 1) { ?>
+                                                <td class="center" style="vertical-align: middle;"><?php echo htmlentities($result->QuantityBorrow); ?></td>
+                                                <td class="center" style="vertical-align: middle;">
+                                                    <?php if ($result->Method == 1) { ?>
                                                         <a href="#" class="btn btn-success btn-xs">Online</a>
                                                     <?php } else { ?>
                                                         <a href="#" class="btn btn-danger btn-xs">Offline</a>
                                                     <?php } ?>
                                                 </td>
-                                                <td class="center">
-                                                    <?php
-                                                    // Kiểm tra BorrowStatus và hiển thị trạng thái tương ứng
-                                                    if ($result->BorrowStatus == '0') {
-                                                        // Nút màu vàng cho "Chưa duyệt" và thêm nút "Xóa"
-                                                        echo '<a href="#" class="btn btn-warning btn-xs">Chưa duyệt</a>';
-                                                        echo ' <a href="issued-books.php?deleteid=' . htmlentities($result->id) . '" class="btn btn-danger btn-xs" onclick="return confirm(\'Bạn có chắc chắn muốn xóa yêu cầu này không?\');">Xóa</a>';
-                                                    } elseif ($result->BorrowStatus == '1') {
-                                                        if ($result->Method == 1) {
-                                                            echo '<a href="#" class="btn btn-success btn-xs">Đã duyệt</a> ';
+                                                <td class="center" style="vertical-align: middle;">
+                                                    <div class=" btn-container" style="display: flex; justify-content: center; align-items: center;">
+                                                        <?php
+                                                        if ($result->BorrowStatus == '0') {
+                                                            echo '<span class="btn btn-warning btn-xs" style="margin-right: 5px;">Chưa duyệt</span>';
+                                                            echo '<a href="issued-books.php?deleteid=' . htmlentities($result->id) . '" class="btn btn-danger btn-xs" onclick="return confirm(\'Bạn có chắc chắn muốn xóa yêu cầu này không?\');">Xóa</a>';
+                                                        } elseif ($result->BorrowStatus == '1') {
+                                                            echo '<a href="#" class="btn custom-success btn-xs">Đã duyệt</a>'; // Sử dụng class tùy chỉnh
+                                                        } elseif ($result->BorrowStatus == '2') {
+                                                            echo '<a href="#" class="btn btn-info btn-xs">Đã trả</a>';
+                                                        } elseif ($result->BorrowStatus == NULL) {
+                                                            echo '<a href="#" class="btn btn-danger btn-xs">Từ chối</a>';
                                                         } else {
-                                                            echo '<a href="#" class="btn btn-success btn-xs">Đã duyệt</a>'; // Nút màu xanh cho "Đã duyệt"
+                                                            echo '<span class="text-muted">Unknown Status</span>';
                                                         }
-                                                    } elseif ($result->BorrowStatus == '2') {
-                                                        echo '<a href="#" class="btn btn-info btn-xs">Đã trả</a>'; // Nút màu xanh da trời cho "Đã trả"
-                                                    } elseif ($result->BorrowStatus == NULL) {
-                                                        echo '<a href="#" class="btn btn-danger btn-xs">Từ chối</a>'; // Nút màu đỏ cho "Từ chối"
-                                                    } else {
-                                                        echo '<span class="text-muted">Unknown Status</span>'; // Hiển thị thông báo trạng thái không xác định
-                                                    }
-                                                    ?>
+                                                        ?>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         <?php $cnt = $cnt + 1;

@@ -3,7 +3,7 @@ session_start();
 error_reporting(0);
 include('includes/config.php');
 if (strlen($_SESSION['alogin']) == 0) {
-    header("location:../adminlogin.php"); 
+    header("location:../adminlogin.php");
     exit();
 } else {
     if (isset($_GET['del'])) {

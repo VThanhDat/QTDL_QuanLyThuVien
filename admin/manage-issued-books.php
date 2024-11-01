@@ -8,17 +8,17 @@ if (strlen($_SESSION['alogin']) == 0) {
 } else {
     if (isset($_GET['rid'])) {
         $rid = intval($_GET['rid']);
-        $borrowstatus = 2;  
+        $borrowstatus = 2;
         // Correct SQL update statement
         $sql = "UPDATE ctmuontra SET BorrowStatus = :borrowstatus WHERE id = :rid";
         $query = $dbh->prepare($sql);
         $query->bindParam(':rid', $rid, PDO::PARAM_STR);
-        $query->bindParam(':borrowstatus', $borrowstatus, PDO::PARAM_STR);    
-        $query->execute();  
-    
+        $query->bindParam(':borrowstatus', $borrowstatus, PDO::PARAM_STR);
+        $query->execute();
+
         // Set the success message in the session
         $_SESSION['msg'] = "Đã trả sách thành công";
-    
+
         // Redirect to the same page to display the message
         header('location:manage-issued-books.php');
         exit(); // Make sure to stop script execution after redirection

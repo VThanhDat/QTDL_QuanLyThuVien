@@ -27,9 +27,11 @@ if (strlen($_SESSION['alogin']) == 0) {
         $image_new_name = time() . '.' . $image_extension;  // Tạo tên mới để tránh trùng
 
         // Đường dẫn lưu trữ ảnh trong thư mục admin/assets/img
-        $image_folder = "F:/Github/QTDL_QuanLyThuVien/admin/assets/img/" . $image_new_name;
+        $image_folder = __DIR__ . "/assets/img/" . $image_new_name;
+
+        // Di chuyển ảnh đã upload vào thư mục img
         move_uploaded_file($image_tmp, $image_folder);
-        
+
         // Gọi stored procedure để thêm sách vào cơ sở dữ liệu
         $sql = "CALL InsertBook(:bookname, :category, :author, :isbn, :price, :image,:quantity,:stock,:method)";
         $query = $dbh->prepare($sql);

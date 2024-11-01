@@ -3,26 +3,35 @@ session_start();
 error_reporting(0);
 include('includes/config.php');
 if (strlen($_SESSION['alogin']) == 0) {
-    header("location:../adminlogin.php"); 
+    header("location:../adminlogin.php");
     exit(); // Thêm exit để đảm bảo ngừng thực thi mã sau khi chuyển hướng
 } else {
 
     if (isset($_POST['create'])) {
         $category = $_POST['category'];
         $status = $_POST['status'];
-        $sql = "INSERT INTO theloai(CategoryName,Status) VALUES(:category,:status)";
-        $query = $dbh->prepare($sql);
-        $query->bindParam(':category', $category, PDO::PARAM_STR);
-        $query->bindParam(':status', $status, PDO::PARAM_STR);
-        $query->execute();
-        $lastInsertId = $dbh->lastInsertId();
-        if ($lastInsertId) {
-            $_SESSION['msg'] = "Thêm thể loại thành công";
-        } else {
-            $_SESSION['error'] = "Có lỗi xảy ra, vui lòng thử lại !!!";
+
+        try {
+            $sql = "INSERT INTO theloai(CategoryName, Status) VALUES(:category, :status)";
+            $query = $dbh->prepare($sql);
+            $query->bindParam(':category', $category, PDO::PARAM_STR);
+            $query->bindParam(':status', $status, PDO::PARAM_STR);
+            $query->execute();
+
+            $lastInsertId = $dbh->lastInsertId();
+            if ($lastInsertId) {
+                $_SESSION['msg'] = "Thêm thể loại thành công";
+            }
+            header('location:manage-categories.php');
+            exit();
+        } catch (PDOException $e) {
+            // Kiểm tra lỗi nếu trigger bắt lỗi tên thể loại đã tồn tại
+            if (strpos($e->getMessage(), 'Tên thể loại đã tồn tại') !== false) {
+                $_SESSION['error'] = "Tên thể loại đã tồn tại. Vui lòng chọn tên khác.";
+            } else {
+                $_SESSION['error'] = "Có lỗi xảy ra, vui lòng thử lại !!!";
+            }
         }
-        header('location:manage-categories.php');
-        exit(); // Dừng thực thi mã sau khi chuyển hướng
     }
 ?>
     <!DOCTYPE html>
@@ -54,6 +63,16 @@ if (strlen($_SESSION['alogin']) == 0) {
                 <div class="row pad-botm">
                     <div class="col-md-12">
                         <h4 class="header-line">Thêm thể loại</h4>
+                    </div>
+                    <div class="row">
+                        <?php if ($_SESSION['error']) { ?>
+                            <div class="col-md-6">
+                                <div class="alert alert-danger">
+                                    <strong>Error:</strong> <?php echo htmlentities($_SESSION['error']); ?>
+                                    <?php $_SESSION['error'] = ""; ?>
+                                </div>
+                            </div>
+                        <?php } ?>
                     </div>
                 </div>
                 <div class="row">

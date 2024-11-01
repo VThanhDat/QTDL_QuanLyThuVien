@@ -8,9 +8,27 @@ if (strlen($_SESSION['login']) == 0) {
     exit();
 }
 
-// Truy vấn để lấy dữ liệu sách từ cơ sở dữ liệu
-$sql = "SELECT * FROM sach";
+// Số lượng sách mỗi trang
+$booksPerPage = 8; // Thay đổi giá trị này nếu cần
+// Xác định trang hiện tại
+$current_page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$current_page = max(1, $current_page); // Đảm bảo trang bắt đầu từ 1
+
+// Tính toán offset
+$offset = ($current_page - 1) * $booksPerPage;
+
+// Truy vấn để lấy tổng số sách
+$sqlTotal = "SELECT COUNT(*) FROM sach";
+$queryTotal = $dbh->prepare($sqlTotal);
+$queryTotal->execute();
+$totalBooks = $queryTotal->fetchColumn();
+$totalPages = ceil($totalBooks / $booksPerPage);
+
+// Truy vấn để lấy dữ liệu sách từ cơ sở dữ liệu với phân trang
+$sql = "SELECT * FROM sach LIMIT :offset, :booksPerPage";
 $query = $dbh->prepare($sql);
+$query->bindParam(':offset', $offset, PDO::PARAM_INT);
+$query->bindParam(':booksPerPage', $booksPerPage, PDO::PARAM_INT);
 $query->execute();
 $results = $query->fetchAll(PDO::FETCH_OBJ);
 ?>
@@ -28,6 +46,7 @@ $results = $query->fetchAll(PDO::FETCH_OBJ);
     <link href="assets/css/font-awesome.css" rel="stylesheet" />
     <link href="assets/css/style.css" rel="stylesheet" />
     <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css' />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 
 <body>
@@ -36,16 +55,20 @@ $results = $query->fetchAll(PDO::FETCH_OBJ);
         <div class="container">
             <div class="row pad-botm">
                 <div class="col-md-12">
-                    <h4 class="header-line">TRANG CHỦ</h4>
+                    <h4 class="header-line">
+                        <i class="fas fa-book" style="margin-right: 10px;"></i> SÁCH
+                    </h4>
                 </div>
             </div>
             <div class="row">
                 <?php if ($query->rowCount() > 0) {
                     foreach ($results as $result) { ?>
                         <div class="col-md-3 col-sm-3 col-xs-6">
-                            <div class="card" style="width: 18rem;">
+                            <div class="card" style="width: 23rem;">
                                 <!-- Hiển thị hình ảnh sách nếu có -->
-                                <img src="../admin/assets/img/<?php echo htmlentities($result->Image); ?>" class="card-img-top" alt="<?php echo htmlentities($result->BookName); ?>">
+                                <div class="card-img">
+                                    <img src="../admin/assets/img/<?php echo htmlentities($result->Image); ?>" class="card-img-top" alt="<?php echo htmlentities($result->BookName); ?>">
+                                </div>
                                 <div class="card-body">
                                     <h5 class="card-title"><?php echo htmlentities($result->BookName); ?></h5>
                                     <p class="card-text">Hình thức:<?php if ($result->Method == 1) { ?>
@@ -70,6 +93,19 @@ $results = $query->fetchAll(PDO::FETCH_OBJ);
                         <p>Không có sách nào để hiển thị.</p>
                     </div>
                 <?php } ?>
+            </div>
+
+            <!-- Phân trang -->
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <ul class="pagination">
+                        <?php for ($page = 1; $page <= $totalPages; $page++) { ?>
+                            <li class="<?php echo ($page == $current_page) ? 'active' : ''; ?>">
+                                <a href="?page=<?php echo $page; ?>"><?php echo $page; ?></a>
+                            </li>
+                        <?php } ?>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
