@@ -35,11 +35,7 @@ if (isset($_POST['update'])) {
             $_SESSION['msg'] = "Số lượng sách sửa đổi sẽ làm cho số lượng tồn kho trở về dưới 0.";
         } else {
             // Proceed with the image upload and update logic if the stock is valid
-<<<<<<< HEAD
             $target_dir = __DIR__ . "/assets/img/"; // Ensure this directory is writable
-=======
-            $target_dir = __DIR__ . "/assets/img/";
->>>>>>> d29e54eac4c8dc038956b0ad19b8996327c993b9
             $imagePath = null; // Initialize image path variable
 
             // Handle image upload

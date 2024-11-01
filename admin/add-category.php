@@ -10,22 +10,14 @@ if (strlen($_SESSION['alogin']) == 0) {
     if (isset($_POST['create'])) {
         $category = $_POST['category'];
         $status = $_POST['status'];
-<<<<<<< HEAD
 
-=======
-    
->>>>>>> d29e54eac4c8dc038956b0ad19b8996327c993b9
         try {
             $sql = "INSERT INTO theloai(CategoryName, Status) VALUES(:category, :status)";
             $query = $dbh->prepare($sql);
             $query->bindParam(':category', $category, PDO::PARAM_STR);
             $query->bindParam(':status', $status, PDO::PARAM_STR);
             $query->execute();
-<<<<<<< HEAD
 
-=======
-            
->>>>>>> d29e54eac4c8dc038956b0ad19b8996327c993b9
             $lastInsertId = $dbh->lastInsertId();
             if ($lastInsertId) {
                 $_SESSION['msg'] = "Thêm thể loại thành công";
