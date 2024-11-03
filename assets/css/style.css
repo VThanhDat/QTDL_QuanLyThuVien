@@ -238,6 +238,48 @@ input.form-control.input-sm {
   margin-left: 4px;
 }
 
+.input-group {
+  display: flex;
+}
+
+.input-group .form-control {
+  width: auto;
+  flex: 1;
+}
+
+.input-group-btn button {
+  margin-left: 5px;
+}
+
+select[name="method"] {
+  width: auto;
+  margin-left: 5px;
+}
+
+.alert {
+  display: flex; /* Sử dụng flexbox để căn chỉnh nội dung */
+  justify-content: space-between; /* Căn giữa nội dung, với không gian giữa */
+}
+
+.icon-green {
+  color: #28a745; /* Màu xanh lá cây cho các biểu tượng */
+  margin-right: 10px; /* Khoảng cách giữa biểu tượng và tiêu đề */
+}
+
+.number-display {
+  font-size: 36px; /* Kích thước chữ lớn cho số */
+  font-weight: bold; /* In đậm số */
+  color: #333; /* Màu chữ cho số */
+}
+
+.book-title {
+  font-size: 18px; /* Kích thước chữ cho tiêu đề */
+  font-weight: normal; /* Chữ thường cho tiêu đề */
+  color: #333; /* Màu chữ cho tiêu đề */
+  text-align: left; /* Căn trái cho tiêu đề */
+}
+
+
 /* =============================================================
    FOOTER SECTION STYLES
  ============================================================ */

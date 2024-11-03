@@ -9,19 +9,93 @@ if (strlen($_SESSION['login']) == 0) {
 } else {
     $sid = $_SESSION['stdid'];
 
-    //     $stmt1 = $dbh->prepare("CALL LaySachDaMuon(:student_id)");
-    //     $stmt1->bindParam(':student_id', $sid, PDO::PARAM_STR);
-    //     $stmt1->execute();
-    //     $issuedBooks = $stmt1->fetchColumn();
-    //     $stmt1->closeCursor();
+    // Hàm lấy số sách đã mượn
+    function getIssuedBooks($dbh, $sid)
+    {
+        // Tổng số sách đã mượn
+        $sqlIssued = "SELECT COUNT(*) FROM ctmuontra WHERE ReaderId = :sid AND BorrowStatus = 2";
+        $queryIssued = $dbh->prepare($sqlIssued);
+        $queryIssued->bindParam(':sid', $sid, PDO::PARAM_INT);
+        $queryIssued->execute();
+        $issuedCount = $queryIssued->fetchColumn();
 
-    //     $stmt2 = $dbh->prepare("CALL LaySachChuaTra(:student_id)");
-    //     $stmt2->bindParam(':student_id', $sid, PDO::PARAM_STR);
-    //     $stmt2->execute();
-    //     $returnedBooks = $stmt2->fetchColumn();
-    //     $stmt2->closeCursor();
+        // Tổng số sách chưa mượn
+        $sqlNotIssued = "SELECT COUNT(*) FROM ctmuontra WHERE ReaderId = :sid AND BorrowStatus = 1";
+        $queryNotIssued = $dbh->prepare($sqlNotIssued);
+        $queryNotIssued->bindParam(':sid', $sid, PDO::PARAM_INT);
+        $queryNotIssued->execute();
+        $notIssuedCount = $queryNotIssued->fetchColumn();
+
+        return $issuedCount + $notIssuedCount;
+    }
+
+    // Hàm lấy số sách đã trả
+    function getReturnedBooks($dbh, $sid)
+    {
+        $sql = "SELECT COUNT(*) FROM ctmuontra WHERE ReaderId = :sid AND BorrowStatus = 2";
+        $query = $dbh->prepare($sql);
+        $query->bindParam(':sid', $sid, PDO::PARAM_INT);
+        $query->execute();
+        return $query->fetchColumn();
+    }
+
+    // Hàm lấy tổng số sách (đã mượn, chưa mượn, bị từ chối)
+    function getTotalBooks($dbh, $sid)
+    {
+        // Tổng số sách đã mượn
+        $sqlIssued = "SELECT COUNT(*) FROM ctmuontra WHERE ReaderId = :sid AND BorrowStatus = 2";
+        $queryIssued = $dbh->prepare($sqlIssued);
+        $queryIssued->bindParam(':sid', $sid, PDO::PARAM_INT);
+        $queryIssued->execute();
+        $issuedCount = $queryIssued->fetchColumn();
+
+        // Tổng số sách chưa mượn
+        $sqlNotIssued = "SELECT COUNT(*) FROM ctmuontra WHERE ReaderId = :sid AND BorrowStatus = 1";
+        $queryNotIssued = $dbh->prepare($sqlNotIssued);
+        $queryNotIssued->bindParam(':sid', $sid, PDO::PARAM_INT);
+        $queryNotIssued->execute();
+        $notIssuedCount = $queryNotIssued->fetchColumn();
+
+        // Tổng số sách bị từ chối (giả sử có trạng thái "rejected")
+        $sqlRejected = "SELECT COUNT(*) FROM ctmuontra WHERE ReaderId = :sid AND BorrowStatus = 0";
+        $queryRejected = $dbh->prepare($sqlRejected);
+        $queryRejected->bindParam(':sid', $sid, PDO::PARAM_INT);
+        $queryRejected->execute();
+        $rejectedCount = $queryRejected->fetchColumn();
+
+        // Tổng số sách = số sách đã mượn + số sách chưa mượn + số sách bị từ chối
+        return $issuedCount + $notIssuedCount + $rejectedCount;
+    }
+
+    // Hàm lấy số sách quá hạn
+    function getOverdueBooks($dbh, $sid)
+    {
+        $sql = "SELECT COUNT(*) FROM ctmuontra WHERE ReaderId = :sid AND ReturnDate < NOW() AND BorrowStatus = 1";
+        $query = $dbh->prepare($sql);
+        $query->bindParam(':sid', $sid, PDO::PARAM_INT);
+        $query->execute();
+        return $query->fetchColumn();
+    }
+
+    // Hàm lấy số sách đang chờ
+    function getReservedBooks($dbh, $sid)
+    {
+        $sql = "SELECT COUNT(*) FROM ctmuontra WHERE ReaderId = :sid AND BorrowStatus = 0";
+        $query = $dbh->prepare($sql);
+        $query->bindParam(':sid', $sid, PDO::PARAM_INT);
+        $query->execute();
+        return $query->fetchColumn();
+    }
+
+    // Gọi các hàm và lưu kết quả
+    $issuedBooks = getIssuedBooks($dbh, $sid);
+    $returnedBooks = getReturnedBooks($dbh, $sid);
+    $totalBooks = getTotalBooks($dbh, $sid);
+    $overdueBooks = getOverdueBooks($dbh, $sid);
+    $reservedBooks = getReservedBooks($dbh, $sid);
 }
 ?>
+
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 
@@ -49,49 +123,53 @@ if (strlen($_SESSION['login']) == 0) {
                     </h4>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-md-6 col-sm-6 col-xs-12">
-                    <div class="alert alert-info back-widget-set text-center text-left">
-                        <i class="fa fa-bars fa-5x icon-green"></i>
-                        <!-- <h3><?php echo htmlentities($issuedBooks); ?> </h3> -->
-                        Số Sách Đã Mượn
-                    </div>
+            <div class="content-wrapper">
+        <div class="row">
+            <div class="col-md-6 col-sm-6 col-xs-12">
+                <div class="alert alert-info back-widget-set">
+                    <i class="fa fa-bars fa-5x icon-green"></i>
+                    <span class="book-title">Số Sách Đã Mượn</span>
+                    <h3 class="number-display"><?php echo htmlentities($issuedBooks); ?></h3>
                 </div>
+            </div>
 
-                <div class="col-md-6 col-sm-6 col-xs-12">
-                    <div class="alert alert-warning back-widget-set text-center text-left">
-                        <i class="fa fa-recycle fa-5x icon-green"></i>
-                        <!-- <h3><?php echo htmlentities($returnedBooks); ?></h3> -->
-                        Số Sách Chưa Trả
-                    </div>
+            <div class="col-md-6 col-sm-6 col-xs-12">
+                <div class="alert alert-warning back-widget-set">
+                    <i class="fa fa-recycle fa-5x icon-green"></i>
+                    <span class="book-title">Số Sách Đã Trả</span>
+                    <h3 class="number-display"><?php echo htmlentities($returnedBooks); ?></h3>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-md-6 col-sm-6 col-xs-12">
-                    <div class="alert alert-success back-widget-set text-center text-left">
-                        <i class="fa fa-check fa-5x icon-green"></i>
-                        <!-- <h3><?php echo htmlentities($totalBooks); ?></h3> -->
-                        Tổng Số Sách
-                    </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 col-sm-6 col-xs-12">
+                <div class="alert alert-success back-widget-set">
+                    <i class="fa fa-check fa-5x icon-green"></i>
+                    <span class="book-title">Tổng Số Sách</span>
+                    <h3 class="number-display"><?php echo htmlentities($totalBooks); ?></h3>
                 </div>
+            </div>
 
-                <div class="col-md-6 col-sm-6 col-xs-12">
-                    <div class="alert alert-danger back-widget-set text-center text-left">
-                        <i class="fa fa-exclamation-triangle fa-5x icon-green"></i>
-                        <!-- <h3><?php echo htmlentities($overdueBooks); ?></h3> -->
-                        Số Sách Quá Hạn
-                    </div>
+            <div class="col-md-6 col-sm-6 col-xs-12">
+                <div class="alert alert-danger back-widget-set">
+                    <i class="fa fa-exclamation-triangle fa-5x icon-green"></i>
+                    <span class="book-title">Số Sách Quá Hạn</span>
+                    <h3 class="number-display"><?php echo htmlentities($overdueBooks); ?></h3>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-md-6 col-sm-6 col-xs-12">
-                    <div class="alert alert-custom back-widget-set text-center text-left">
-                        <i class="fa fa-bookmark fa-5x icon-green"></i>
-                        <!-- <h3><?php echo htmlentities($reservedBooks); ?></h3> -->
-                        Số Sách Đang Chờ
-                    </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 col-sm-6 col-xs-12">
+                <div class="alert alert-custom back-widget-set">
+                    <i class="fa fa-bookmark fa-5x icon-green"></i>
+                    <span class="book-title">Số Sách Đang Chờ Duyệt</span>
+                    <h3 class="number-display"><?php echo htmlentities($reservedBooks); ?></h3>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
         </div>
     </div>
     <?php include('includes/footer.php'); ?>
