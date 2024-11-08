@@ -144,7 +144,7 @@ if (strlen($_SESSION['alogin']) == 0) {
                             $returnedbooks = $query2->rowCount();
                             ?>
                             <h3><?php echo htmlentities($returnedbooks); ?></h3>
-                            Số sách đã được chưa trả
+                            Số sách mượn chưa trả
                         </div>
                     </div>
                 </div>

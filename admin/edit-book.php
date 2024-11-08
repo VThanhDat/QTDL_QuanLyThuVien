@@ -19,7 +19,7 @@ if (isset($_POST['update'])) {
     $bookid = intval($_GET['bookid']);
 
     // Step 1: Retrieve the current stock of the book
-    $sqlCurrentStock = "SELECT Stock FROM sach WHERE id=:bookid";
+    $sqlCurrentStock = "SELECT Quantity,Stock FROM sach WHERE id=:bookid";
     $queryCurrentStock = $dbh->prepare($sqlCurrentStock);
     $queryCurrentStock->bindParam(':bookid', $bookid, PDO::PARAM_STR);
     $queryCurrentStock->execute();
@@ -28,11 +28,13 @@ if (isset($_POST['update'])) {
     // Check if the current stock exists
     if ($currentStockResult) {
         // Calculate the new stock after update
-        $newStock = $quantity - $currentStockResult->Stock;
+        $newStock = $quantity - $currentStockResult->Quantity + $currentStockResult->Stock;
 
         // Check if the new stock would be less than 0
         if ($newStock < 0) {
-            $_SESSION['msg'] = "Số lượng sách sửa đổi sẽ làm cho số lượng tồn kho trở về dưới 0.";
+            $_SESSION['error'] = "Số lượng sách sửa đổi sẽ làm cho số lượng tồn kho trở về dưới 0.";
+            header('location:manage-books.php');
+            exit();
         } else {
             // Proceed with the image upload and update logic if the stock is valid
             $target_dir = __DIR__ . "/assets/img/"; // Ensure this directory is writable

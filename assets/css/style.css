@@ -334,3 +334,7 @@ footer {
   color: #28a745;
   /* màu xanh lá sáng hơn khi hover */
 }
+
+.disabled-link {
+  pointer-events: none; /* Ngừng các sự kiện click */
+}

@@ -114,14 +114,15 @@ if (strlen($_SESSION['login']) == 0) {
                                                     <div class=" btn-container" style="display: flex; justify-content: center; align-items: center;">
                                                         <?php
                                                         if ($result->BorrowStatus == '0') {
-                                                            echo '<span class="btn btn-warning btn-xs" style="margin-right: 5px;">Chưa duyệt</span>';
+                                                            echo '<span class="btn btn-warning btn-xs disabled-link" style="margin-right: 5px;">Chưa duyệt</span>';
                                                             echo '<a href="issued-books.php?deleteid=' . htmlentities($result->id) . '" class="btn btn-danger btn-xs" onclick="return confirm(\'Bạn có chắc chắn muốn xóa yêu cầu này không?\');">Xóa</a>';
                                                         } elseif ($result->BorrowStatus == '1') {
-                                                            echo '<a href="#" class="btn custom-success btn-xs">Đã duyệt</a>'; // Sử dụng class tùy chỉnh
+                                                            echo '<a href="#" class="btn custom-success btn-xs disabled-link">Đã duyệt</a>'; // Sử dụng class tùy chỉnh
                                                         } elseif ($result->BorrowStatus == '2') {
-                                                            echo '<a href="#" class="btn btn-info btn-xs">Đã trả</a>';
+                                                            echo '<a href="#" class="btn btn-info btn-xs disabled-link">Đã trả</a>';
                                                         } elseif ($result->BorrowStatus == NULL) {
-                                                            echo '<a href="#" class="btn btn-danger btn-xs">Từ chối</a>';
+                                                            echo '<a href="#" style="margin-right: 5px;" class="btn btn-danger btn-xs disabled-link">Từ chối</a>';
+                                                            echo '<a href="issued-books.php?deleteid=' . htmlentities($result->id) . '" class="btn btn-danger btn-xs" onclick="return confirm(\'Bạn có chắc chắn muốn xóa yêu cầu này không?\');">Xóa</a>';
                                                         } else {
                                                             echo '<span class="text-muted">Unknown Status</span>';
                                                         }
