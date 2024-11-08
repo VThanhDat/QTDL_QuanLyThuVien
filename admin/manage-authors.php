@@ -93,6 +93,7 @@ if (strlen($_SESSION['alogin']) == 0) {
                         <div class="panel panel-default">
                             <div class="panel-heading">
                                 Danh sách tác giả
+                                <a style="margin-left: 10px; float: right;" href="export-authors.php" class="btn btn-success">Xuất ra Excel</a>
                             </div>
                             <div class="panel-body">
                                 <div class="table-responsive">

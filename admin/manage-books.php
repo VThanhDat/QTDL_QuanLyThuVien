@@ -98,6 +98,8 @@ if (strlen($_SESSION['alogin']) == 0) {
                         <div class="panel panel-default">
                             <div class="panel-heading">
                                 Danh sách Sách
+                                <a style="margin-left: 10px; float: right;" href="export-books.php" class="btn btn-success">Xuất ra Excel</a>
+
                             </div>
                             <div class="panel-body">
                                 <div class="table-responsive">

@@ -52,18 +52,21 @@ if (strlen($_SESSION['alogin']) == 0) {
                     <div class="col-md-3 col-sm-3 col-xs-6">
                         <div class="alert alert-info back-widget-set text-center">
                             <i class="fa fa-bars fa-5x"></i>
-
-
                             <?php
-                            $sql1 = "SELECT id from ctmuontra ";
-                            $query1 = $dbh->prepare($sql1);
-                            $query1->execute();
-                            $results1 = $query1->fetchAll(PDO::FETCH_OBJ);
-                            $issuedbooks = $query1->rowCount();
-                            ?>
+                                $status = 1;
 
+                                // Chuẩn bị câu lệnh gọi thủ tục
+                                $query1 = $dbh->prepare("CALL LaySachDaMuonChuaTra(:status)");
+                                $query1->bindParam(':status', $status, PDO::PARAM_INT);
+
+                                // Thực thi truy vấn
+                                $query1->execute();
+                                $results1 = $query1->fetchAll(PDO::FETCH_OBJ);
+                                $issuedbooks = $query1->rowCount();
+                                $query1->closeCursor(); // Giải phóng kết quả để có thể tiếp tục truy vấn khác
+                            ?>
                             <h3><?php echo htmlentities($issuedbooks); ?> </h3>
-                            Số sách đã được mượn
+                            Số sách đã được mượn chưa trả
                         </div>
                     </div>
 
@@ -129,22 +132,6 @@ if (strlen($_SESSION['alogin']) == 0) {
 
                             <h3><?php echo htmlentities($listdcats); ?> </h3>
                             Số thể loại
-                        </div>
-                    </div>
-
-                    <div class="col-md-3 col-sm-3 col-xs-6">
-                        <div class="alert alert-warning back-widget-set text-center">
-                            <i class="fa fa-recycle fa-5x"></i>
-                            <?php
-                            $status = 1;
-                            $stmt1 = $dbh->prepare("CALL LaySachDaMuon(:status)");
-                            $query2->bindParam(':status', $status, PDO::PARAM_STR);
-                            $query2->execute();
-                            $results2 = $query2->fetchAll(PDO::FETCH_OBJ);
-                            $returnedbooks = $query2->rowCount();
-                            ?>
-                            <h3><?php echo htmlentities($returnedbooks); ?></h3>
-                            Số sách mượn chưa trả
                         </div>
                     </div>
                 </div>

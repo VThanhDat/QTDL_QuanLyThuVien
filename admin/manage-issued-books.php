@@ -54,7 +54,7 @@ if (strlen($_SESSION['alogin']) == 0) {
             <div class="container">
                 <div class="row pad-botm">
                     <div class="col-md-12">
-                        <h4 class="header-line">Quản lý mượn trả</h4>
+                        <h4 class="header-line">Quản lý mượn trả OFFLINE</h4>
                     </div>
                     <div class="row">
                         <?php if ($_SESSION['error']) { ?>
@@ -102,6 +102,7 @@ if (strlen($_SESSION['alogin']) == 0) {
                         <div class="panel panel-default">
                             <div class="panel-heading">
                                 Quản lý mượn trả
+                                <a style="margin-left: 10px; float: right;" href="export-offline-borrow-return.php" class="btn btn-success">Xuất ra Excel</a>
                             </div>
                             <div class="panel-body">
                                 <div class="table-responsive">
