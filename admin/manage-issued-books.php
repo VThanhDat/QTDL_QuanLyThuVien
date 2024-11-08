@@ -145,29 +145,33 @@ if (strlen($_SESSION['alogin']) == 0) {
                                                                             }
                                                                             ?></td>
                                                         <td class="center"><?php echo htmlentities($result->QuantityBorrow); ?></td>
-                                                        <td class="center">
-                                                            <?php if ($result->BorrowStatus == '0') { ?>
-                                                                <a href="manage-issued-books-online.php?approve_id=<?php echo htmlentities($result->rid); ?>">
-                                                                    <button class="btn btn-success"><i class="fa fa-check "></i> Duyệt</button>
-                                                                </a>
-                                                                <a href="manage-issued-books-online.php?reject_id=<?php echo htmlentities($result->rid); ?>">
-                                                                    <button class="btn btn-warning"><i class="fa fa-times "></i> Từ chối</button>
-                                                                </a>
-                                                            <?php } elseif ($result->BorrowStatus == '1') { ?>
-                                                                <button class="btn btn-info" disabled><i class="fa fa-check "></i> Đã duyệt</button>
-                                                            <?php } elseif ($result->BorrowStatus == '2') { ?>
-                                                                <button class="btn btn-danger" disabled><i class="fa fa-times "></i> Đã trả</button>
-                                                            <?php } else { ?>
-                                                                <button class="btn btn-danger" disabled><i class="fa fa-times "></i> Từ chối</button>
-                                                            <?php } ?>
+                                                        <td class="center" style="vertical-align: middle;">
+                                                            <div class=" btn-container" style="display: flex; justify-content: center; align-items: center; gap: 3px;">
+                                                                <?php if ($result->BorrowStatus == '0') { ?>
+                                                                    <a href="manage-issued-books-online.php?approve_id=<?php echo htmlentities($result->rid); ?>">
+                                                                        <button class="btn btn-success"><i class="fa fa-check "></i> Duyệt</button>
+                                                                    </a>
+                                                                    <a href="manage-issued-books-online.php?reject_id=<?php echo htmlentities($result->rid); ?>">
+                                                                        <button class="btn btn-warning"><i class="fa fa-times "></i> Từ chối</button>
+                                                                    </a>
+                                                                <?php } elseif ($result->BorrowStatus == '1') { ?>
+                                                                    <button class="btn btn-info" disabled><i class="fa fa-check "></i> Đã duyệt</button>
+                                                                <?php } elseif ($result->BorrowStatus == '2') { ?>
+                                                                    <button class="btn btn-danger" disabled><i class="fa fa-times "></i> Đã trả</button>
+                                                                <?php } else { ?>
+                                                                    <button class="btn btn-danger" disabled><i class="fa fa-times "></i> Từ chối</button>
+                                                                <?php } ?>
+                                                            </div>
                                                         </td>
 
-                                                        <td class="center">
-                                                            <?php if ($result->BorrowStatus == '1') { ?>
-                                                                <a href="manage-issued-books.php?rid=<?php echo htmlentities($result->rid); ?>"><button class="btn btn-primary"><i class="fa fa-edit "></i> Trả Sách</button>
-                                                                <?php } else { ?>
-                                                                    <button class="btn btn-danger" disabled><i class="fa fa-edit "></i> Đã trả</button>
-                                                                <?php } ?>
+                                                        <td class="center" style="vertical-align: middle;">
+                                                            <div class=" btn-container" style="display: flex; justify-content: center; align-items: center; gap: 3px;">
+                                                                <?php if ($result->BorrowStatus == '1') { ?>
+                                                                    <a href="manage-issued-books.php?rid=<?php echo htmlentities($result->rid); ?>"><button class="btn btn-primary"><i class="fa fa-edit "></i> Trả Sách</button>
+                                                                    <?php } else { ?>
+                                                                        <button class="btn btn-danger" disabled><i class="fa fa-edit "></i> Đã trả</button>
+                                                                    <?php } ?>
+                                                            </div>
                                                         </td>
                                                     </tr>
                                             <?php $cnt = $cnt + 1;

@@ -144,13 +144,15 @@ if (strlen($_SESSION['alogin']) == 0) {
                                                                 <a href="#" class="btn btn-danger btn-xs">Offline</a>
                                                             <?php } ?>
                                                         </td>
-                                                        <td class="center">
-                                                            <a href="edit-book.php?bookid=<?php echo htmlentities($result->bookid); ?>">
-                                                                <button class="btn btn-primary"><i class="fa fa-edit"></i> Sửa</button>
-                                                            </a>
-                                                            <a href="manage-books.php?del=<?php echo htmlentities($result->bookid); ?>" onclick="return confirm('Bạn chắc chắn muốn xóa?');">
-                                                                <button class="btn btn-danger"><i class="fa fa-pencil"></i> Xóa</button>
-                                                            </a>
+                                                        <td class="center" style="vertical-align: middle;">
+                                                            <div class=" btn-container" style="display: flex; justify-content: center; align-items: center; gap: 3px;">
+                                                                <a href="edit-book.php?bookid=<?php echo htmlentities($result->bookid); ?>">
+                                                                    <button class="btn btn-primary"><i class="fa fa-edit"></i> Sửa</button>
+                                                                </a>
+                                                                <a href="manage-books.php?del=<?php echo htmlentities($result->bookid); ?>" onclick="return confirm('Bạn chắc chắn muốn xóa?');">
+                                                                    <button class="btn btn-danger"><i class="fa fa-pencil"></i> Xóa</button>
+                                                                </a>
+                                                            </div>
                                                         </td>
                                                     </tr>
                                             <?php $cnt++;

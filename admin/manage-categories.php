@@ -132,9 +132,11 @@ if (strlen($_SESSION['alogin']) == 0) {
                                                         </td>
                                                         <td class="center"><?php echo htmlentities($result->CreationDate); ?></td>
                                                         <td class="center"><?php echo htmlentities($result->UpdationDate); ?></td>
-                                                        <td class="center">
-                                                            <a href="edit-category.php?catid=<?php echo htmlentities($result->id); ?>" class="btn btn-primary"><i class="fa fa-edit"></i> Sửa</a>
-                                                            <a href="manage-categories.php?del=<?php echo htmlentities($result->id); ?>" onclick="return confirm('Bạn đồng ý xóa thể loại?');" class="btn btn-danger"><i class="fa fa-trash"></i> Xóa</a>
+                                                        <td class="center" style="vertical-align: middle;">
+                                                            <div class=" btn-container" style="display: flex; justify-content: center; align-items: center; gap: 3px;">
+                                                                <a href="edit-category.php?catid=<?php echo htmlentities($result->id); ?>" class="btn btn-primary"><i class="fa fa-edit"></i> Sửa</a>
+                                                                <a href="manage-categories.php?del=<?php echo htmlentities($result->id); ?>" onclick="return confirm('Bạn đồng ý xóa thể loại?');" class="btn btn-danger"><i class="fa fa-trash"></i> Xóa</a>
+                                                            </div>
                                                         </td>
                                                     </tr>
                                             <?php $cnt++;

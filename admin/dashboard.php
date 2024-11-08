@@ -64,7 +64,7 @@ if (strlen($_SESSION['alogin']) == 0) {
 
                             <h3><?php echo htmlentities($issuedbooks); ?> </h3>
                             Số sách đã được mượn
-                        </div>x
+                        </div>
                     </div>
 
                     <div class="col-md-3 col-sm-3 col-xs-6">

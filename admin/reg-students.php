@@ -107,14 +107,15 @@ if (strlen($_SESSION['alogin']) == 0) {
                                                                                 echo htmlentities("Đã Bị Chặn");
                                                                             }
                                                                             ?></td>
-                                                        <td class="center">
-                                                            <?php if ($result->Status == 1) { ?>
-                                                                <a href="reg-students.php?inid=<?php echo htmlentities($result->id); ?>" onclick="return confirm('Bạn có chắc muốn chặn người này?');"> <button class=" btn btn-danger"> Chặn</button>
-                                                                <?php } else { ?>
+                                                        <td class="center" style="vertical-align: middle;">
+                                                            <div class=" btn-container" style="display: flex; justify-content: center; align-items: center; gap: 3px;">
+                                                                <?php if ($result->Status == 1) { ?>
+                                                                    <a href="reg-students.php?inid=<?php echo htmlentities($result->id); ?>" onclick="return confirm('Bạn có chắc muốn chặn người này?');"> <button class=" btn btn-danger"> Chặn</button>
+                                                                    <?php } else { ?>
 
-                                                                    <a href="reg-students.php?id=<?php echo htmlentities($result->id); ?>" onclick="return confirm('Bạn có muốn bỏ chặn người này?');"><button class=" btn btn-primary"> Bỏ Chặn</button>
-                                                                    <?php } ?>
-
+                                                                        <a href="reg-students.php?id=<?php echo htmlentities($result->id); ?>" onclick="return confirm('Bạn có muốn bỏ chặn người này?');"><button class=" btn btn-primary"> Bỏ Chặn</button>
+                                                                        <?php } ?>
+                                                            </div>
                                                         </td>
                                                     </tr>
                                             <?php $cnt = $cnt + 1;

@@ -1,20 +1,12 @@
 <div class="navbar navbar-inverse set-radius-zero">
-    <div class="container">
+<div class="container" style="display: flex; align-items: center; justify-content: space-between;">
         <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
             <a class="navbar-brand">
-
                 <img src="assets/img/logo.png" />
             </a>
-
         </div>
-
         <div class="right-div">
-            <a href="logout.php" class="btn btn-danger pull-right">Đăng xuất</a>
+            <a href="logout.php" class="btn btn-primary">ĐĂNG XUẤT</a>
         </div>
     </div>
 </div>
