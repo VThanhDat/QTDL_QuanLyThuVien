@@ -78,15 +78,22 @@ if (strlen($_SESSION['login']) == 0) {
     }
 
     // Hàm lấy số sách đang chờ
-    function getReservedBooks($dbh, $sid)
-    {
-        $sql = "SELECT COUNT(*) FROM ctmuontra WHERE ReaderId = :sid AND BorrowStatus = 0";
+    function getReservedBooks($dbh, $sid) {
+        // Gọi function MySQL getReservedBooks và lấy kết quả
+        $sql = "SELECT getReservedBooks(:sid) AS reservedBooks";
         $query = $dbh->prepare($sql);
+    
+        // Gán giá trị cho tham số `sid`
         $query->bindParam(':sid', $sid, PDO::PARAM_INT);
+    
+        // Thực thi truy vấn và lấy kết quả
         $query->execute();
-        return $query->fetchColumn();
+        $result = $query->fetch(PDO::FETCH_ASSOC);
+    
+        // Trả về số sách đang chờ
+        return $result['reservedBooks'];
     }
-
+    
     // Gọi các hàm và lưu kết quả
     $issuedBooks = getIssuedBooks($dbh, $sid);
     $returnedBooks = getReturnedBooks($dbh, $sid);
@@ -129,7 +136,7 @@ if (strlen($_SESSION['login']) == 0) {
                 <div class="alert alert-info back-widget-set">
                     <i class="fa fa-bars fa-5x icon-green"></i>
                     <span class="book-title">Số Sách Đã Mượn</span>
-                    <h3 class="number-display"><?php echo htmlentities($issuedBooks); ?></h3>
+                    <h5 class="number-display"><?php echo htmlentities($issuedBooks); ?></h5>
                 </div>
             </div>
 
@@ -137,7 +144,7 @@ if (strlen($_SESSION['login']) == 0) {
                 <div class="alert alert-warning back-widget-set">
                     <i class="fa fa-recycle fa-5x icon-green"></i>
                     <span class="book-title">Số Sách Đã Trả</span>
-                    <h3 class="number-display"><?php echo htmlentities($returnedBooks); ?></h3>
+                    <h5 class="number-display"><?php echo htmlentities($returnedBooks); ?></h5>
                 </div>
             </div>
         </div>
@@ -146,7 +153,7 @@ if (strlen($_SESSION['login']) == 0) {
                 <div class="alert alert-success back-widget-set">
                     <i class="fa fa-check fa-5x icon-green"></i>
                     <span class="book-title">Tổng Số Sách</span>
-                    <h3 class="number-display"><?php echo htmlentities($totalBooks); ?></h3>
+                    <h5 class="number-display"><?php echo htmlentities($totalBooks); ?></h5>
                 </div>
             </div>
 
@@ -154,7 +161,7 @@ if (strlen($_SESSION['login']) == 0) {
                 <div class="alert alert-danger back-widget-set">
                     <i class="fa fa-exclamation-triangle fa-5x icon-green"></i>
                     <span class="book-title">Số Sách Quá Hạn</span>
-                    <h3 class="number-display"><?php echo htmlentities($overdueBooks); ?></h3>
+                    <h5 class="number-display"><?php echo htmlentities($overdueBooks); ?></h5>
                 </div>
             </div>
         </div>
@@ -163,7 +170,7 @@ if (strlen($_SESSION['login']) == 0) {
                 <div class="alert alert-custom back-widget-set">
                     <i class="fa fa-bookmark fa-5x icon-green"></i>
                     <span class="book-title">Số Sách Đang Chờ Duyệt</span>
-                    <h3 class="number-display"><?php echo htmlentities($reservedBooks); ?></h3>
+                    <h5 class="number-display"><?php echo htmlentities($reservedBooks); ?></h5>
                 </div>
             </div>
         </div>
