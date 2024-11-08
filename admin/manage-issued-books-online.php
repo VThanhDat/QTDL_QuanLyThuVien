@@ -94,7 +94,7 @@ if (strlen($_SESSION['alogin']) == 0) {
                 $queryUpdateStock->bindParam(':approve_id', $approve_id, PDO::PARAM_INT);
                 $queryUpdateStock->execute(); // Update stock in sach table
 
-                // Update borrow status
+                // Update borrow status (Not updating ReturnDate)
                 $borrowstatus = 1; // Trạng thái "Duyệt" mượn
                 $sql = "UPDATE ctmuontra SET BorrowStatus = :borrowstatus WHERE id = :approve_id";
                 $query = $dbh->prepare($sql);

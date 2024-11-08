@@ -15,16 +15,34 @@ if (strlen($_SESSION['alogin']) == 0) {
     $queryUpdate = $dbh->prepare($sqlUpdate);
     $queryUpdate->execute();
 
-    // Delete book
+   // Delete book
     if (isset($_GET['del'])) {
         $id = $_GET['del'];
-        $sql = "DELETE FROM sach WHERE id = :id";
-        $query = $dbh->prepare($sql);
-        $query->bindParam(':id', $id, PDO::PARAM_STR);
-        if ($query->execute()) {
-            $_SESSION['delmsg'] = "Xóa sách thành công";
+
+        // Kiểm tra xem sách có đang mượn chưa trả hay không
+        $sqlCheck = "SELECT COUNT(*) AS BorrowedBooks
+                    FROM ctmuontra 
+                    WHERE BookId = :id AND BorrowStatus = 1";
+        $queryCheck = $dbh->prepare($sqlCheck);
+        $queryCheck->bindParam(':id', $id, PDO::PARAM_STR);
+        $queryCheck->execute();
+        $borrowedBooks = $queryCheck->fetch(PDO::FETCH_ASSOC);
+
+        // Nếu có sách đang mượn chưa trả
+        if ($borrowedBooks['BorrowedBooks'] > 0) {
+            $_SESSION['error'] = "Sách này đang mượn chưa trả, không thể xóa.";
+            header('location:manage-books.php');
+            exit();
         } else {
-            $_SESSION['error'] = "Không thể xóa sách";
+            // Nếu không có sách đang mượn, thực hiện xóa
+            $sql = "DELETE FROM sach WHERE id = :id";
+            $query = $dbh->prepare($sql);
+            $query->bindParam(':id', $id, PDO::PARAM_STR);
+            if ($query->execute()) {
+                $_SESSION['delmsg'] = "Xóa sách thành công";
+            } else {
+                $_SESSION['error'] = "Không thể xóa sách";
+            }
         }
         header('location:manage-books.php');
         exit();

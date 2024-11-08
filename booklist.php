@@ -1,6 +1,10 @@
 <?php
 session_start();
 error_reporting(0);
+if (isset($_SESSION['borrow_success'])) {
+    echo "<script>alert('" . $_SESSION['borrow_success'] . "');</script>";
+    unset($_SESSION['borrow_success']); // Xóa thông báo sau khi đã hiển thị
+}
 include('includes/config.php');
 
 if (strlen($_SESSION['login']) == 0) {

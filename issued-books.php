@@ -122,7 +122,6 @@ if (strlen($_SESSION['login']) == 0) {
                                                             echo '<a href="#" class="btn btn-info btn-xs disabled-link">Đã trả</a>';
                                                         } elseif ($result->BorrowStatus == NULL) {
                                                             echo '<a href="#" style="margin-right: 5px;" class="btn btn-danger btn-xs disabled-link">Từ chối</a>';
-                                                            echo '<a href="issued-books.php?deleteid=' . htmlentities($result->id) . '" class="btn btn-danger btn-xs" onclick="return confirm(\'Bạn có chắc chắn muốn xóa yêu cầu này không?\');">Xóa</a>';
                                                         } else {
                                                             echo '<span class="text-muted">Unknown Status</span>';
                                                         }

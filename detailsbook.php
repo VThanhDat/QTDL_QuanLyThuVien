@@ -18,7 +18,7 @@ if (isset($_POST['borrow'])) {
     $sid = $_SESSION['stdid'];
 
     // Kiểm tra xem người dùng đã mượn sách này chưa
-    $checkSql = "SELECT * FROM ctmuontra WHERE ReaderId = :sid AND BookId = :bookid AND BorrowStatus = 0";
+    $checkSql = "SELECT * FROM ctmuontra WHERE ReaderId = :sid AND BookId = :bookid AND (BorrowStatus = 0 OR BorrowStatus = 1)";
     $checkQuery = $dbh->prepare($checkSql);
     $checkQuery->bindParam(':sid', $sid, PDO::PARAM_STR);
     $checkQuery->bindParam(':bookid', $book_id, PDO::PARAM_INT);
@@ -26,7 +26,7 @@ if (isset($_POST['borrow'])) {
 
     if ($checkQuery->rowCount() > 0) {
         // Nếu có kết quả trả về, nghĩa là đã mượn sách nhưng chưa trả
-        echo "<script>alert('Cuốn sách này bạn đã mượn nhưng chưa trả.');</script>";
+        echo "<script>alert('Cuốn sách này bạn đã mượn hoặc đang chờ duyệt.');</script>";
     } else {
         // Kiểm tra số lượng sách có trong kho
         $stockSql = "SELECT Stock FROM sach WHERE id = :bookid"; // Assuming 'Stock' is the column name
@@ -57,7 +57,10 @@ if (isset($_POST['borrow'])) {
             $query->bindParam(':returndate', $returndate->format('Y-m-d H:i:s'), PDO::PARAM_STR); // Định dạng ngày trả
 
             if ($query->execute()) {
-                echo "<script>alert('Mượn sách thành công');</script>";
+                // Lưu thông báo vào session trước khi chuyển hướng
+                $_SESSION['borrow_success'] = "Mượn sách thành công";
+                
+                // Chuyển hướng đến booklist.php
                 header('location:booklist.php');
                 exit();
             } else {
