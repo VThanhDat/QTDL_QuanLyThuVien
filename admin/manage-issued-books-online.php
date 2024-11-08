@@ -96,7 +96,7 @@ if (strlen($_SESSION['alogin']) == 0) {
 
                 // Update borrow status (Not updating ReturnDate)
                 $borrowstatus = 1; // Trạng thái "Duyệt" mượn
-                $sql = "UPDATE ctmuontra SET BorrowStatus = :borrowstatus WHERE id = :approve_id";
+                $sql = "UPDATE ctmuontra SET BorrowStatus = :borrowstatus, ReturnDate = ReturnDate WHERE id = :approve_id";
                 $query = $dbh->prepare($sql);
                 $query->bindParam(':approve_id', $approve_id, PDO::PARAM_INT);
                 $query->bindParam(':borrowstatus', $borrowstatus, PDO::PARAM_INT);
