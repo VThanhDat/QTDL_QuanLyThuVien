@@ -12,6 +12,9 @@ if (strlen($_SESSION['alogin']) == 0) {
         $status = $_POST['status'];
 
         try {
+            // Bắt đầu giao dịch
+            $dbh->beginTransaction();
+
             $sql = "INSERT INTO theloai(CategoryName, Status) VALUES(:category, :status)";
             $query = $dbh->prepare($sql);
             $query->bindParam(':category', $category, PDO::PARAM_STR);
@@ -20,11 +23,16 @@ if (strlen($_SESSION['alogin']) == 0) {
 
             $lastInsertId = $dbh->lastInsertId();
             if ($lastInsertId) {
+                // Commit giao dịch nếu thành công
+                $dbh->commit();
                 $_SESSION['msg'] = "Thêm thể loại thành công";
             }
             header('location:manage-categories.php');
             exit();
         } catch (PDOException $e) {
+            // Rollback giao dịch nếu có lỗi
+            $dbh->rollBack();
+
             // Kiểm tra lỗi nếu trigger bắt lỗi tên thể loại đã tồn tại
             if (strpos($e->getMessage(), 'Tên thể loại đã tồn tại') !== false) {
                 $_SESSION['error'] = "Tên thể loại đã tồn tại. Vui lòng chọn tên khác.";
@@ -34,6 +42,7 @@ if (strlen($_SESSION['alogin']) == 0) {
         }
     }
 ?>
+
     <!DOCTYPE html>
     <html xmlns="http://www.w3.org/1999/xhtml">
 
