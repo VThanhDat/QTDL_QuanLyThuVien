@@ -7,6 +7,11 @@ if (strlen($_SESSION['alogin']) == 0) {
     exit(); // Thêm exit để đảm bảo ngừng thực thi mã sau khi chuyển hướng
 }
 
+// Khởi tạo biến session nếu chưa có
+if (!isset($_SESSION['error'])) {
+    $_SESSION['error'] = "";
+}
+
 if (isset($_POST['create'])) {
     $author = $_POST['author'];
     // Thêm tác giả mới vào cơ sở dữ liệu
@@ -66,7 +71,7 @@ if (isset($_POST['create'])) {
                     <h4 class="header-line">Thêm Tác Giả</h4>
                 </div>
                 <div class="row">
-                    <?php if ($_SESSION['error']) { ?>
+                    <?php if (isset($_SESSION['error']) && $_SESSION['error']) { ?>
                         <div class="col-md-6">
                             <div class="alert alert-danger">
                                 <strong>Error:</strong> <?php echo htmlentities($_SESSION['error']); ?>
