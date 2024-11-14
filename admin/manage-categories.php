@@ -9,12 +9,16 @@ if (strlen($_SESSION['alogin']) == 0) {
 } else {
     if (isset($_GET['del'])) {
         $id = $_GET['del'];
-        $sql = "DELETE FROM theloai WHERE id=:id";
-        $query = $dbh->prepare($sql);
-        $query->bindParam(':id', $id, PDO::PARAM_INT);
-        $query->execute();
-        // Thay vì dùng rowCount(), mặc định xem xóa thành công
-        $_SESSION['delmsg'] = "Xóa thể loại thành công!!";
+        try {
+            $sql = "DELETE FROM theloai WHERE id=:id";
+            $query = $dbh->prepare($sql);
+            $query->bindParam(':id', $id, PDO::PARAM_INT);
+            $query->execute();
+            $_SESSION['delmsg'] = "Xóa thể loại thành công!!";
+        } catch (PDOException $e) {
+            // Thông báo lỗi chi tiết để ghi log hoặc hiển thị
+            $_SESSION['error'] = "Không thể xóa tên thể loại này. ";
+        }
         header('location:manage-categories.php');
         exit();
     }

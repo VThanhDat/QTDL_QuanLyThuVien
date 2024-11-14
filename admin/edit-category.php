@@ -8,19 +8,29 @@ if (strlen($_SESSION['alogin']) == 0) {
     exit(); // Thêm exit để đảm bảo ngừng thực thi mã sau khi chuyển hướng
 } else {
     if (isset($_POST['update'])) {
-        $category = $_POST['category'];
-        $status = $_POST['status'];
-        $catid = intval($_GET['catid']);
-        $sql = "UPDATE theloai SET CategoryName=:category, Status=:status WHERE id=:catid";
-        $query = $dbh->prepare($sql);
-        $query->bindParam(':category', $category, PDO::PARAM_STR);
-        $query->bindParam(':status', $status, PDO::PARAM_STR);
-        $query->bindParam(':catid', $catid, PDO::PARAM_INT);
-        $query->execute();
-
-        $_SESSION['updatemsg'] = "Thể loại đã được cập nhật thành công!";
-        header('location:manage-categories.php');
-    }
+        try {
+            $category = $_POST['category'];
+            $status = $_POST['status'];
+            $catid = intval($_GET['catid']);
+            $sql = "UPDATE theloai SET CategoryName=:category, Status=:status WHERE id=:catid";
+            $query = $dbh->prepare($sql);
+            $query->bindParam(':category', $category, PDO::PARAM_STR);
+            $query->bindParam(':status', $status, PDO::PARAM_STR);
+            $query->bindParam(':catid', $catid, PDO::PARAM_INT);
+            $query->execute();
+    
+            $_SESSION['success'] = "Thể loại đã được cập nhật thành công!";
+            header('location:manage-categories.php');
+            exit(); // Đảm bảo dừng thực thi sau khi chuyển hướng
+        } catch (PDOException $e) {
+            // Kiểm tra thông báo lỗi từ trigger
+            if ($e->getCode() == '23000') {
+                $_SESSION['error'] = "Tên thể loại đã tồn tại. Vui lòng chọn tên khác.";
+            } else {
+                $_SESSION['error'] = "Có lỗi xảy ra: " . $e->getMessage();
+            }
+        }
+    }    
 ?>
     <!DOCTYPE html>
     <html xmlns="http://www.w3.org/1999/xhtml">
@@ -52,6 +62,16 @@ if (strlen($_SESSION['alogin']) == 0) {
                 <div class="row pad-botm">
                     <div class="col-md-12">
                         <h4 class="header-line">Sửa Thể Loại</h4>
+                    </div>
+                    <div class="row">
+                        <?php if ($_SESSION['error']) { ?>
+                            <div class="col-md-6">
+                                <div class="alert alert-danger">
+                                    <strong>Error:</strong> <?php echo htmlentities($_SESSION['error']); ?>
+                                    <?php $_SESSION['error'] = ""; ?>
+                                </div>
+                            </div>
+                        <?php } ?>
                     </div>
                 </div>
 

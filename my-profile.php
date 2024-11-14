@@ -10,12 +10,14 @@ if (strlen($_SESSION['login']) == 0) {
         $sid = $_SESSION['stdid'];
         $fullname = $_POST['fullname'];
         $mobileno = $_POST['mobileno'];
+        $email = $_POST['email'];
 
-        $sql = "UPDATE docgia SET FullName=:fullname, MobileNumber=:mobileno WHERE id=:sid";
+        $sql = "UPDATE docgia SET FullName=:fullname, MobileNumber=:mobileno, EmailId=:email WHERE id=:sid";
         $query = $dbh->prepare($sql);
         $query->bindParam(':sid', $sid, PDO::PARAM_STR);
         $query->bindParam(':fullname', $fullname, PDO::PARAM_STR);
         $query->bindParam(':mobileno', $mobileno, PDO::PARAM_STR);
+        $query->bindParam(':email', $email, PDO::PARAM_STR);
         $query->execute();
 
         echo '<script>alert("Thông tin tài khoản đã được cập nhật")</script>';
@@ -132,7 +134,7 @@ if (strlen($_SESSION['login']) == 0) {
                                     </div>
                                     <div class="form-group">
                                         <label>Địa Chỉ Email</label>
-                                        <input class="form-control" type="email" name="email" value="<?php echo htmlentities($result->EmailId); ?>" autocomplete="off" required readonly />
+                                        <input class="form-control" type="email" name="email" value="<?php echo htmlentities($result->EmailId); ?>" autocomplete="off" required />
                                     </div>
                                     <button type="submit" name="update" class="btn btn-primary">Thay đổi</button>
                                 </form>

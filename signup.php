@@ -101,8 +101,9 @@ if (isset($_POST['signup'])) {
 
                                 <div class="form-group">
                                     <label>Số điện thoại :</label>
-                                    <input class="form-control" type="text" name="mobileno" maxlength="10" autocomplete="off" required />
+                                    <input class="form-control" type="text" name="mobileno" maxlength="10" pattern="\d{10}" title="Số điện thoại chỉ được chứa 10 chữ số" autocomplete="off" required />
                                 </div>
+
 
                                 <div class="form-group">
                                     <label>Nhập Email</label>

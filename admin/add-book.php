@@ -19,7 +19,6 @@ if (strlen($_SESSION['alogin']) == 0) {
         $stock = $_POST['quantity'];
         $method = $_POST['method'];
 
-
         // Xử lý ảnh
         $image = $_FILES["book_image"]["name"];
         $image_tmp = $_FILES["book_image"]["tmp_name"];
@@ -29,33 +28,47 @@ if (strlen($_SESSION['alogin']) == 0) {
         // Đường dẫn lưu trữ ảnh trong thư mục admin/assets/img
         $image_folder = __DIR__ . "/assets/img/" . $image_new_name;
 
-        // Di chuyển ảnh đã upload vào thư mục img
-        move_uploaded_file($image_tmp, $image_folder);
+        // Kiểm tra sự tồn tại của sách trước khi thêm
+        $sql_check = "SELECT * FROM sach WHERE BookName=:bookname AND CatId=:category AND AuthorId=:author";
+        $query_check = $dbh->prepare($sql_check);
+        $query_check->bindParam(':bookname', $bookname, PDO::PARAM_STR);
+        $query_check->bindParam(':category', $category, PDO::PARAM_INT);
+        $query_check->bindParam(':author', $author, PDO::PARAM_INT);
+        $query_check->execute();
 
-        // Gọi stored procedure để thêm sách vào cơ sở dữ liệu
-        $sql = "CALL InsertBook(:bookname, :category, :author, :isbn, :price, :image,:quantity,:stock,:method)";
-        $query = $dbh->prepare($sql);
-        $query->bindParam(':bookname', $bookname, PDO::PARAM_STR);
-        $query->bindParam(':category', $category, PDO::PARAM_INT);
-        $query->bindParam(':author', $author, PDO::PARAM_INT);
-        $query->bindParam(':isbn', $isbn, PDO::PARAM_STR);
-        $query->bindParam(':price', $price, PDO::PARAM_STR);
-        $query->bindParam(':image', $image_new_name, PDO::PARAM_STR);  // Lưu tên ảnh vào
-        $query->bindParam(':quantity', $quantity, PDO::PARAM_STR);
-        $query->bindParam(':stock', $stock, PDO::PARAM_STR);
-        $query->bindParam(':method', $method, PDO::PARAM_STR);
-
-        // Thực thi truy vấn
-        $query->execute();
-        $rowCount = $query->rowCount();
-
-        // Kiểm tra xem việc thêm sách có thành công không
-        if ($rowCount > 0) {
-            $_SESSION['msg'] = "Thêm sách thành công";
+        if ($query_check->rowCount() > 0) {
+            // Nếu sách đã tồn tại
+            $_SESSION['error'] = "Cuốn sách này đã tồn tại";
             header('location:manage-books.php');
         } else {
-            $_SESSION['error'] = "Có lỗi xảy ra, vui lòng thử lại !!!";
-            header('location:manage-books.php');
+            // Di chuyển ảnh đã upload vào thư mục img
+            move_uploaded_file($image_tmp, $image_folder);
+
+            // Gọi stored procedure để thêm sách vào cơ sở dữ liệu
+            $sql = "CALL InsertBook(:bookname, :category, :author, :isbn, :price, :image, :quantity, :stock, :method)";
+            $query = $dbh->prepare($sql);
+            $query->bindParam(':bookname', $bookname, PDO::PARAM_STR);
+            $query->bindParam(':category', $category, PDO::PARAM_INT);
+            $query->bindParam(':author', $author, PDO::PARAM_INT);
+            $query->bindParam(':isbn', $isbn, PDO::PARAM_STR);
+            $query->bindParam(':price', $price, PDO::PARAM_STR);
+            $query->bindParam(':image', $image_new_name, PDO::PARAM_STR);  // Lưu tên ảnh vào
+            $query->bindParam(':quantity', $quantity, PDO::PARAM_STR);
+            $query->bindParam(':stock', $stock, PDO::PARAM_STR);
+            $query->bindParam(':method', $method, PDO::PARAM_STR);
+
+            // Thực thi truy vấn
+            $query->execute();
+            $rowCount = $query->rowCount();
+
+            // Kiểm tra xem việc thêm sách có thành công không
+            if ($rowCount > 0) {
+                $_SESSION['msg'] = "Thêm sách thành công";
+                header('location:manage-books.php');
+            } else {
+                $_SESSION['error'] = "Có lỗi xảy ra, vui lòng thử lại !!!";
+                header('location:manage-books.php');
+            }
         }
     }
 ?>

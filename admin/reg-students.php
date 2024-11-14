@@ -4,29 +4,51 @@ error_reporting(0);
 include('includes/config.php');
 if (strlen($_SESSION['alogin']) == 0) {
     header("location:../adminlogin.php");
-    exit(); // Thêm exit để đảm bảo ngừng thực thi mã sau khi chuyển hướng
+    exit(); // Đảm bảo ngừng thực thi mã sau khi chuyển hướng
 } else {
-    // code for block student    
+    // Code để chặn độc giả
     if (isset($_GET['inid'])) {
         $id = $_GET['inid'];
         $status = 0;
-        $sql = "update docgia set Status=:status WHERE id=:id";
+        $sql = "UPDATE docgia SET Status=:status WHERE id=:id";
         $query = $dbh->prepare($sql);
         $query->bindParam(':id', $id, PDO::PARAM_STR);
         $query->bindParam(':status', $status, PDO::PARAM_STR);
         $query->execute();
         header('location:reg-students.php');
+        exit();
     }
-    //code for active students
+
+    // Code để kích hoạt độc giả
     if (isset($_GET['id'])) {
         $id = $_GET['id'];
         $status = 1;
-        $sql = "update docgia set Status=:status WHERE id=:id";
+        $sql = "UPDATE docgia SET Status=:status WHERE id=:id";
         $query = $dbh->prepare($sql);
         $query->bindParam(':id', $id, PDO::PARAM_STR);
         $query->bindParam(':status', $status, PDO::PARAM_STR);
         $query->execute();
         header('location:reg-students.php');
+        exit();
+    }
+
+    // Xóa độc giả
+    if (isset($_GET['delid'])) {
+        $id = $_GET['delid'];
+        try {
+
+            // Xóa độc giả nếu không có bản ghi mượn trả với BorrowStatus = 2
+            $sql = "DELETE FROM docgia WHERE id = :id";
+            $query = $dbh->prepare($sql);
+            $query->bindParam(':id', $id, PDO::PARAM_STR);
+            $query->execute();
+            $_SESSION['delmsg'] = "Xóa độc giả thành công";
+        } catch (PDOException $e) {
+            // Thông báo lỗi nếu có sự cố khi thực thi câu lệnh
+            $_SESSION['error'] = "Không thể xóa độc giả này vì còn giao dịch mượn trả";
+        }
+        header('location:reg-students.php');
+        exit();
     }
 ?>
     <!DOCTYPE html>
@@ -37,7 +59,7 @@ if (strlen($_SESSION['alogin']) == 0) {
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
         <meta name="description" content="" />
         <meta name="author" content="" />
-        <title>Ouản Lý Thư Viện | Quản lý tài khoản</title>
+        <title>Quản Lý Thư Viện | Quản lý tài khoản</title>
         <!-- BOOTSTRAP CORE STYLE  -->
         <link href="assets/css/bootstrap.css" rel="stylesheet" />
         <!-- FONT AWESOME STYLE  -->
@@ -48,7 +70,6 @@ if (strlen($_SESSION['alogin']) == 0) {
         <link href="assets/css/style.css" rel="stylesheet" />
         <!-- GOOGLE FONT -->
         <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css' />
-
     </head>
 
     <body>
@@ -61,8 +82,25 @@ if (strlen($_SESSION['alogin']) == 0) {
                     <div class="col-md-12">
                         <h4 class="header-line">Quản lý tài khoản</h4>
                     </div>
+                    <div class="row">
+                        <?php if ($_SESSION['error']) { ?>
+                            <div class="col-md-6">
+                                <div class="alert alert-danger">
+                                    <strong>Error:</strong> <?php echo htmlentities($_SESSION['error']); ?>
+                                    <?php $_SESSION['error'] = ""; ?>
+                                </div>
+                            </div>
+                        <?php } ?>
 
-
+                        <?php if ($_SESSION['delmsg']) { ?>
+                            <div class="col-md-6">
+                                <div class="alert alert-success">
+                                    <strong>Success:</strong> <?php echo htmlentities($_SESSION['delmsg']); ?>
+                                    <?php $_SESSION['delmsg'] = ""; ?>
+                                </div>
+                            </div>
+                        <?php } ?>
+                    </div>
                 </div>
                 <div class="row">
                     <div class="col-md-12">
@@ -71,7 +109,6 @@ if (strlen($_SESSION['alogin']) == 0) {
                             <div class="panel-heading">
                                 Tài khoản
                                 <a style="margin-left: 10px; float: right;" href="export-users.php" class="btn btn-success">Xuất ra Excel</a>
-
                             </div>
                             <div class="panel-body">
                                 <div class="table-responsive">
@@ -80,7 +117,7 @@ if (strlen($_SESSION['alogin']) == 0) {
                                             <tr>
                                                 <th>#</th>
                                                 <th>Tên độc giả</th>
-                                                <th>Email </th>
+                                                <th>Email</th>
                                                 <th>SĐT</th>
                                                 <th>Ngày đăng kí</th>
                                                 <th>Trạng thái</th>
@@ -88,13 +125,14 @@ if (strlen($_SESSION['alogin']) == 0) {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <?php $sql = "SELECT * from docgia";
+                                            <?php
+                                            $sql = "SELECT * FROM docgia";
                                             $query = $dbh->prepare($sql);
                                             $query->execute();
                                             $results = $query->fetchAll(PDO::FETCH_OBJ);
                                             $cnt = 1;
                                             if ($query->rowCount() > 0) {
-                                                foreach ($results as $result) {               ?>
+                                                foreach ($results as $result) { ?>
                                                     <tr class="odd gradeX">
                                                         <td class="center"><?php echo htmlentities($cnt); ?></td>
                                                         <td class="center"><?php echo htmlentities($result->FullName); ?></td>
@@ -104,19 +142,22 @@ if (strlen($_SESSION['alogin']) == 0) {
                                                         <td class="center"><?php if ($result->Status == 1) {
                                                                                 echo htmlentities("Đang Hoạt Động");
                                                                             } else {
-
-
                                                                                 echo htmlentities("Đã Bị Chặn");
-                                                                            }
-                                                                            ?></td>
+                                                                            } ?></td>
                                                         <td class="center" style="vertical-align: middle;">
-                                                            <div class=" btn-container" style="display: flex; justify-content: center; align-items: center; gap: 3px;">
+                                                            <div class="btn-container" style="display: flex; justify-content: center; align-items: center; gap: 3px;">
                                                                 <?php if ($result->Status == 1) { ?>
-                                                                    <a href="reg-students.php?inid=<?php echo htmlentities($result->id); ?>" onclick="return confirm('Bạn có chắc muốn chặn người này?');"> <button class=" btn btn-danger"> Chặn</button>
-                                                                    <?php } else { ?>
-
-                                                                        <a href="reg-students.php?id=<?php echo htmlentities($result->id); ?>" onclick="return confirm('Bạn có muốn bỏ chặn người này?');"><button class=" btn btn-primary"> Bỏ Chặn</button>
-                                                                        <?php } ?>
+                                                                    <a href="reg-students.php?inid=<?php echo htmlentities($result->id); ?>" onclick="return confirm('Bạn có chắc muốn chặn người này?');">
+                                                                        <button class="btn btn-danger">Chặn</button>
+                                                                    </a>
+                                                                <?php } else { ?>
+                                                                    <a href="reg-students.php?id=<?php echo htmlentities($result->id); ?>" onclick="return confirm('Bạn có muốn bỏ chặn người này?');">
+                                                                        <button class="btn btn-primary">Bỏ Chặn</button>
+                                                                    </a>
+                                                                <?php } ?>
+                                                                <a href="reg-students.php?delid=<?php echo htmlentities($result->id); ?>" onclick="return confirm('Bạn có chắc muốn xóa người này?');">
+                                                                    <button class="btn btn-warning">Xóa</button>
+                                                                </a>
                                                             </div>
                                                         </td>
                                                     </tr>
@@ -126,15 +167,11 @@ if (strlen($_SESSION['alogin']) == 0) {
                                         </tbody>
                                     </table>
                                 </div>
-
                             </div>
                         </div>
                         <!--End Advanced Tables -->
                     </div>
                 </div>
-
-
-
             </div>
         </div>
 

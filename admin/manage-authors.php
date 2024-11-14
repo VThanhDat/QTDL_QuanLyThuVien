@@ -8,11 +8,16 @@ if (strlen($_SESSION['alogin']) == 0) {
 } else {
     if (isset($_GET['del'])) {
         $id = $_GET['del'];
-        $sql = "delete from tacgia WHERE id=:id";
-        $query = $dbh->prepare($sql);
-        $query->bindParam(':id', $id, PDO::PARAM_STR);
-        $query->execute();
-        $_SESSION['delmsg'] = "Xóa tác giả thành công";
+        try {
+            $id = $_GET['del'];
+            $sql = "delete from tacgia WHERE id=:id";
+            $query = $dbh->prepare($sql);
+            $query->bindParam(':id', $id, PDO::PARAM_STR);
+            $query->execute();
+            $_SESSION['delmsg'] = "Xóa tác giả thành công";
+        } catch (PDOException $e) {
+            $_SESSION['error'] = "Không thể xóa tác giả này. ";
+        }
         header('location:manage-authors.php');
         exit();
     }

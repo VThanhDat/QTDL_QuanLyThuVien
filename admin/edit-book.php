@@ -18,6 +18,21 @@ if (isset($_POST['update'])) {
     $method = $_POST['method'];
     $bookid = intval($_GET['bookid']);
 
+    // Kiểm tra sách trùng tên, thể loại và tác giả
+    $sqlCheckDuplicate = "SELECT id FROM sach WHERE BookName=:bookname AND CatId=:category AND AuthorId=:author AND id != :bookid";
+    $queryCheckDuplicate = $dbh->prepare($sqlCheckDuplicate);
+    $queryCheckDuplicate->bindParam(':bookname', $bookname, PDO::PARAM_STR);
+    $queryCheckDuplicate->bindParam(':category', $category, PDO::PARAM_STR);
+    $queryCheckDuplicate->bindParam(':author', $author, PDO::PARAM_STR);
+    $queryCheckDuplicate->bindParam(':bookid', $bookid, PDO::PARAM_STR);
+    $queryCheckDuplicate->execute();
+
+    if ($queryCheckDuplicate->rowCount() > 0) {
+        $_SESSION['error'] = "Cuốn sách này đã tồn tại.";
+        header('location:manage-books.php');
+        exit();
+    }
+
     // Step 1: Retrieve the current stock of the book
     $sqlCurrentStock = "SELECT Quantity,Stock FROM sach WHERE id=:bookid";
     $queryCurrentStock = $dbh->prepare($sqlCurrentStock);
