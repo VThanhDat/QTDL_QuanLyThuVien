@@ -8,9 +8,22 @@ if (strlen($_SESSION['alogin']) == 0) {
     exit(); // Ensure to stop executing code after redirection
 } else {
     if (isset($_POST['update'])) {
-        try {
-            $athrid = intval($_GET['athrid']);
-            $author = $_POST['author'];
+        $athrid = intval($_GET['athrid']);
+        $author = $_POST['author'];
+
+        // Kiểm tra tên tác giả đã tồn tại chưa (ngoại trừ tác giả hiện tại)
+        $checkSql = "SELECT * FROM tacgia WHERE AuthorName=:author AND id != :athrid";
+        $checkQuery = $dbh->prepare($checkSql);
+        $checkQuery->bindParam(':author', $author, PDO::PARAM_STR);
+        $checkQuery->bindParam(':athrid', $athrid, PDO::PARAM_INT);
+        $checkQuery->execute();
+
+        if ($checkQuery->rowCount() > 0) {
+            $_SESSION['error'] = "Tên tác giả đã tồn tại, vui lòng chọn tên khác!";
+            header("location:edit-author.php?athrid=" . $athrid);
+            exit(); // Dừng thực thi mã sau khi chuyển hướng
+        } else {
+            // Thực hiện cập nhật nếu tên tác giả chưa tồn tại
             $sql = "UPDATE tacgia SET AuthorName=:author WHERE id=:athrid";
             $query = $dbh->prepare($sql);
             $query->bindParam(':author', $author, PDO::PARAM_STR);
@@ -18,14 +31,7 @@ if (strlen($_SESSION['alogin']) == 0) {
             $query->execute();
             $_SESSION['updatemsg'] = "Cập nhật thông tin tác giả thành công";
             header('location:manage-authors.php');
-            exit();
-        } catch (PDOException $e) {
-            // Kiểm tra thông báo lỗi từ trigger
-            if ($e->getCode() == '23000') {
-                $_SESSION['error'] = "Tên tác giả đã tồn tại. Vui lòng chọn tên khác.";
-            } else {
-                $_SESSION['error'] = "Có lỗi xảy ra: " . $e->getMessage();
-            }
+            exit(); // Ensure to stop executing code after redirection
         }
     }
 ?>

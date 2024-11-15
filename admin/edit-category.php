@@ -5,32 +5,38 @@ include('includes/config.php');
 
 if (strlen($_SESSION['alogin']) == 0) {
     header("location:../adminlogin.php");
-    exit(); // Thêm exit để đảm bảo ngừng thực thi mã sau khi chuyển hướng
+    exit();
 } else {
     if (isset($_POST['update'])) {
-        try {
-            $category = $_POST['category'];
-            $status = $_POST['status'];
-            $catid = intval($_GET['catid']);
+        $category = $_POST['category'];
+        $status = $_POST['status'];
+        $catid = intval($_GET['catid']);
+
+        // Kiểm tra tên thể loại đã tồn tại chưa (ngoại trừ thể loại hiện tại)
+        $checkSql = "SELECT * FROM theloai WHERE CategoryName=:category AND id != :catid";
+        $checkQuery = $dbh->prepare($checkSql);
+        $checkQuery->bindParam(':category', $category, PDO::PARAM_STR);
+        $checkQuery->bindParam(':catid', $catid, PDO::PARAM_INT);
+        $checkQuery->execute();
+
+        if ($checkQuery->rowCount() > 0) {
+            $_SESSION['error'] = "Tên thể loại đã tồn tại, vui lòng chọn tên khác!";
+            header("location:edit-category.php?catid=" . $catid);
+            exit(); // Dừng thực thi mã sau khi chuyển hướng
+        } else {
+            // Thực hiện cập nhật nếu tên thể loại chưa tồn tại
             $sql = "UPDATE theloai SET CategoryName=:category, Status=:status WHERE id=:catid";
             $query = $dbh->prepare($sql);
             $query->bindParam(':category', $category, PDO::PARAM_STR);
             $query->bindParam(':status', $status, PDO::PARAM_STR);
             $query->bindParam(':catid', $catid, PDO::PARAM_INT);
             $query->execute();
-    
+
             $_SESSION['success'] = "Thể loại đã được cập nhật thành công!";
             header('location:manage-categories.php');
-            exit(); // Đảm bảo dừng thực thi sau khi chuyển hướng
-        } catch (PDOException $e) {
-            // Kiểm tra thông báo lỗi từ trigger
-            if ($e->getCode() == '23000') {
-                $_SESSION['error'] = "Tên thể loại đã tồn tại. Vui lòng chọn tên khác.";
-            } else {
-                $_SESSION['error'] = "Có lỗi xảy ra: " . $e->getMessage();
-            }
+            exit(); // Dừng thực thi mã sau khi chuyển hướng
         }
-    }    
+    }
 ?>
     <!DOCTYPE html>
     <html xmlns="http://www.w3.org/1999/xhtml">
