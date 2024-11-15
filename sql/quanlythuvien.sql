@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Nov 14, 2024 at 07:30 PM
+-- Generation Time: Nov 15, 2024 at 04:23 AM
 -- Server version: 8.0.39
 -- PHP Version: 8.1.10
 
@@ -112,7 +112,8 @@ INSERT INTO `ctmuontra` (`id`, `BookId`, `ReaderId`, `IssuesDate`, `ReturnDate`,
 (78, 36, 1, '2024-11-14 11:53:15', '2024-11-14 19:05:52', 1, 1, 2),
 (80, 36, 1, '2024-11-14 12:06:51', '2024-11-16 17:00:00', 1, 1, 1),
 (81, 36, 4, '2024-11-14 12:07:09', '2024-11-14 19:08:52', 1, 1, 2),
-(82, 36, 6, '2024-11-14 12:07:40', '2024-11-16 17:00:00', 1, 1, 1);
+(82, 36, 6, '2024-11-14 12:07:40', '2024-11-16 17:00:00', 1, 1, 1),
+(83, 26, 1, '2024-11-15 04:09:50', NULL, 1, 0, 1);
 
 -- --------------------------------------------------------
 
@@ -140,7 +141,8 @@ INSERT INTO `docgia` (`id`, `FullName`, `EmailId`, `MobileNumber`, `Password`, `
 (2, 'thinh', 'thinh@gmail.com', '0123334459', 'e10adc3949ba59abbe56e057f20f883e', 1, '2024-10-15 11:18:55', '2024-11-14 19:26:51'),
 (3, 'qui', 'qui@gmail.com', '0123334458', 'e10adc3949ba59abbe56e057f20f883e', 1, '2024-10-15 15:50:17', '2024-11-14 19:26:44'),
 (4, 'khai', 'khai@gmail.com', '0123334457', 'e10adc3949ba59abbe56e057f20f883e', 1, '2024-11-14 17:27:47', '2024-11-14 19:26:40'),
-(6, 'cuong', 'cuong@gmail.com', '0123334456', 'e10adc3949ba59abbe56e057f20f883e', 1, '2024-11-14 17:28:52', '2024-11-14 19:26:33');
+(6, 'cuong', 'cuong@gmail.com', '0123334456', 'e10adc3949ba59abbe56e057f20f883e', 1, '2024-11-14 17:28:52', '2024-11-14 19:26:33'),
+(9, 'dddd', 'dddd@gmail.com', '1231232131', 'e10adc3949ba59abbe56e057f20f883e', 1, '2024-11-15 04:22:18', NULL);
 
 -- --------------------------------------------------------
 
@@ -168,16 +170,16 @@ CREATE TABLE `sach` (
 --
 
 INSERT INTO `sach` (`id`, `BookName`, `CatId`, `AuthorId`, `ISBNNumber`, `BookPrice`, `RegDate`, `updationDate`, `Image`, `Quantity`, `Stock`, `Method`) VALUES
-(26, 'Sức Mạnh Của EQ - Đánh Thức Trí Tuệ Cảm Xúc - Làm Chủ Ngôn Ngữ - Thu Phục Lòng Người', 1, 1, 12323, 20000.00, '2024-10-30 11:21:03', '2024-11-13 11:54:07', 'bia_1_suc-manh-cua-eq.webp', 20, 20, 1),
+(26, 'Sức Mạnh Của EQ - Đánh Thức Trí Tuệ Cảm Xúc - Làm Chủ Ngôn Ngữ - Thu Phục Lòng Người', 1, 1, 12323, 20000.00, '2024-10-30 11:21:03', '2024-11-15 04:20:05', 'bia_1_suc-manh-cua-eq.webp', 20, 19, 1),
 (27, 'Trở Về Không - Trải Nghiệm Ho\'oponopono', 2, 2, 1123, 45120.00, '2024-10-30 11:22:51', '2024-11-14 18:48:50', 'sach-tro-ve-khong-trai-nghiem-hooponopono.webp', 20, 20, 1),
 (28, '30 Tuổi - Mọi Thứ Chỉ Mới Bắt Đầu', 1, 2, 1000, 87750.00, '2024-10-30 11:23:14', '2024-11-08 11:37:31', '30Tuổi-MọiThứChỉMớiBắtĐầu.webp', 20, 20, 0),
 (29, 'Bắt Đầu Cuộc Hành Trình Nội Tại Bản Lĩnh', 2, 2, 212, 30420.00, '2024-10-30 11:24:04', '2024-11-08 08:43:41', 'NoiTaiBanLinh.webp', 20, 20, 1),
 (31, 'Chia Sẻ Từ Trái Tim (Thích Pháp Hòa)', 2, 2, 1123, 122640.00, '2024-10-30 11:22:51', '2024-10-30 12:49:26', 'chiasetutraitim-bia.webp', 20, 20, 0),
 (32, 'Hiểu Về Trái Tim (Tái Bản 2023)', 2, 2, 1000, 135880.00, '2024-10-30 11:23:14', '2024-11-14 18:23:51', 'hiuvetraitim.webp', 30, 30, 0),
-(33, 'Vượt Qua Bản Ngã - Ego Is The Enemy', 2, 2, 212, 114730.00, '2024-10-30 11:24:04', '2024-10-30 12:54:07', 'ego.webp', 30, 30, 0),
+(33, 'Vượt Qua Bản Ngã - Ego Is The Enemy', 2, 2, 2121, 114730.00, '2024-10-30 11:24:04', '2024-11-15 04:05:35', 'ego.webp', 30, 30, 0),
 (34, 'Ảo Tưởng Tích Cực - Useful Delusions', 2, 1, 12345, 61620.00, '2024-10-30 11:47:11', '2024-11-08 12:11:42', 'AoTuongTichCuc.webp', 50, 50, 0),
-(35, 'Giải Mã Hoóc-Môn Dopamin', 1, 1, 12345, 128700.00, '2024-10-30 12:55:02', '2024-11-08 08:34:38', 'Giaima.webp', 10, 10, 0),
-(36, 'Tư Duy Ngược', 1, 1, 111, 69500.00, '2024-11-08 12:42:19', '2024-11-14 19:08:56', '1731069739.webp', 2, 0, 1);
+(35, 'Giải Mã Hoóc-Môn Dopamin', 1, 1, 1234, 128700.00, '2024-10-30 12:55:02', '2024-11-15 04:02:55', 'Giaima.webp', 10, 10, 0),
+(36, 'Tư Duy Ngược', 1, 1, 111, 69500.00, '2024-11-08 12:42:19', '2024-11-15 04:05:52', '1731069739.webp', 2, 0, 1);
 
 -- --------------------------------------------------------
 
@@ -203,21 +205,6 @@ INSERT INTO `tacgia` (`id`, `AuthorName`, `CreationDate`, `UpdationDate`) VALUES
 --
 -- Triggers `tacgia`
 --
-DELIMITER $$
-CREATE TRIGGER `before_edit_tacgia` BEFORE UPDATE ON `tacgia` FOR EACH ROW BEGIN
-    DECLARE author_count INT;
-
-    SELECT COUNT(*) INTO author_count
-    FROM tacgia
-    WHERE AuthorName = NEW.AuthorName;
-
-    IF author_count > 0 THEN
-        SIGNAL SQLSTATE '23000'
-        SET MESSAGE_TEXT = 'Tên tác giả đã tồn tại';
-    END IF;
-END
-$$
-DELIMITER ;
 DELIMITER $$
 CREATE TRIGGER `before_insert_tacgia` BEFORE INSERT ON `tacgia` FOR EACH ROW BEGIN
     DECLARE author_count INT;
@@ -259,23 +246,6 @@ INSERT INTO `theloai` (`id`, `CategoryName`, `Status`, `CreationDate`, `Updation
 --
 -- Triggers `theloai`
 --
-DELIMITER $$
-CREATE TRIGGER `before_edit_theloai` BEFORE UPDATE ON `theloai` FOR EACH ROW BEGIN
-    DECLARE category_count INT;
-
-    -- Đếm số lượng thể loại có tên giống tên mới
-    SELECT COUNT(*) INTO category_count
-    FROM theloai
-    WHERE CategoryName = NEW.CategoryName;
-
-    -- Nếu đã tồn tại tên thể loại, báo lỗi
-    IF category_count > 0 THEN
-        SIGNAL SQLSTATE '23000'
-        SET MESSAGE_TEXT = 'Tên thể loại đã tồn tại';
-    END IF;
-END
-$$
-DELIMITER ;
 DELIMITER $$
 CREATE TRIGGER `before_insert_theloai` BEFORE INSERT ON `theloai` FOR EACH ROW BEGIN
     DECLARE category_count INT;
@@ -346,13 +316,13 @@ ALTER TABLE `theloai`
 -- AUTO_INCREMENT for table `ctmuontra`
 --
 ALTER TABLE `ctmuontra`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=83;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=84;
 
 --
 -- AUTO_INCREMENT for table `docgia`
 --
 ALTER TABLE `docgia`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `sach`
@@ -364,13 +334,13 @@ ALTER TABLE `sach`
 -- AUTO_INCREMENT for table `tacgia`
 --
 ALTER TABLE `tacgia`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `theloai`
 --
 ALTER TABLE `theloai`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- Constraints for dumped tables
