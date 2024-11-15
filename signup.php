@@ -2,28 +2,41 @@
 session_start();
 include('includes/config.php');
 error_reporting(0);
+
 if (isset($_POST['signup'])) {
     $fname = $_POST['fullname'];
     $mobileno = $_POST['mobileno'];
     $email = $_POST['email'];
     $password = md5($_POST['password']);
     $status = 1;
-    $sql = "INSERT INTO docgia(FullName,MobileNumber,EmailId,Password,Status) VALUES(:fname,:mobileno,:email,:password,:status)";
-    $query = $dbh->prepare($sql);
-    $query->bindParam(':fname', $fname, PDO::PARAM_STR);
-    $query->bindParam(':mobileno', $mobileno, PDO::PARAM_STR);
-    $query->bindParam(':email', $email, PDO::PARAM_STR);
-    $query->bindParam(':password', $password, PDO::PARAM_STR);
-    $query->bindParam(':status', $status, PDO::PARAM_STR);
-    $query->execute();
-    $lastInsertId = $dbh->lastInsertId();
-    if ($lastInsertId) {
-        echo '<script>alert("Đăng kí tài khoản thành công")</script>';
+
+    // Kiểm tra sự tồn tại của email và số điện thoại
+    $sql_check = "SELECT * FROM docgia WHERE EmailId=:email OR MobileNumber=:mobileno";
+    $query_check = $dbh->prepare($sql_check);
+    $query_check->bindParam(':email', $email, PDO::PARAM_STR);
+    $query_check->bindParam(':mobileno', $mobileno, PDO::PARAM_STR);
+    $query_check->execute();
+
+    if ($query_check->rowCount() > 0) {
+        echo "<script>alert('Email hoặc số điện thoại này đã tồn tại');</script>";
     } else {
-        echo "<script>alert('Có gì đó sai sai, vui lòng thử lại');</script>";
+        $sql = "INSERT INTO docgia(FullName, MobileNumber, EmailId, Password, Status) VALUES(:fname, :mobileno, :email, :password, :status)";
+        $query = $dbh->prepare($sql);
+        $query->bindParam(':fname', $fname, PDO::PARAM_STR);
+        $query->bindParam(':mobileno', $mobileno, PDO::PARAM_STR);
+        $query->bindParam(':email', $email, PDO::PARAM_STR);
+        $query->bindParam(':password', $password, PDO::PARAM_STR);
+        $query->bindParam(':status', $status, PDO::PARAM_STR);
+        $query->execute();
+        $lastInsertId = $dbh->lastInsertId();
+
+        if ($lastInsertId) {
+            echo '<script>alert("Đăng kí tài khoản thành công");</script>';
+        } else {
+            echo "<script>alert('Có gì đó sai sai, vui lòng thử lại');</script>";
+        }
     }
 }
-
 ?>
 
 <!DOCTYPE html>
