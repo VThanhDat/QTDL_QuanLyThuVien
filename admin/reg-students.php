@@ -19,6 +19,21 @@ if (strlen($_SESSION['alogin']) == 0) {
         exit();
     }
 
+    // Khôi phục mật khẩu về mặc định
+    if (isset($_GET['resetid'])) {
+        $id = $_GET['resetid'];
+        $defaultPassword = md5('123456'); // Mã hóa mật khẩu mặc định
+        $sql = "UPDATE docgia SET Password=:password WHERE id=:id";
+        $query = $dbh->prepare($sql);
+        $query->bindParam(':password', $defaultPassword, PDO::PARAM_STR);
+        $query->bindParam(':id', $id, PDO::PARAM_STR);
+        $query->execute();
+        $_SESSION['success'] = "Khôi phục mật khẩu thành công";
+        header('location:reg-students.php');
+        exit();
+    }
+
+
     // Code để kích hoạt độc giả
     if (isset($_GET['id'])) {
         $id = $_GET['id'];
@@ -36,8 +51,6 @@ if (strlen($_SESSION['alogin']) == 0) {
     if (isset($_GET['delid'])) {
         $id = $_GET['delid'];
         try {
-
-            // Xóa độc giả nếu không có bản ghi mượn trả với BorrowStatus = 2
             $sql = "DELETE FROM docgia WHERE id = :id";
             $query = $dbh->prepare($sql);
             $query->bindParam(':id', $id, PDO::PARAM_STR);
@@ -100,6 +113,15 @@ if (strlen($_SESSION['alogin']) == 0) {
                                 </div>
                             </div>
                         <?php } ?>
+
+                        <?php if ($_SESSION['success']) { ?>
+                            <div class="col-md-6">
+                                <div class="alert alert-success">
+                                    <strong>Success:</strong> <?php echo htmlentities($_SESSION['success']); ?>
+                                    <?php $_SESSION['success'] = ""; ?>
+                                </div>
+                            </div>
+                        <?php } ?>
                     </div>
                 </div>
                 <div class="row">
@@ -155,6 +177,9 @@ if (strlen($_SESSION['alogin']) == 0) {
                                                                         <button class="btn btn-primary">Bỏ Chặn</button>
                                                                     </a>
                                                                 <?php } ?>
+                                                                <a href="reg-students.php?resetid=<?php echo htmlentities($result->id); ?>" onclick="return confirm('Bạn có chắc muốn khôi phục mật khẩu của người này về mặc định?');">
+        <button class="btn btn-info">Khôi phục mật khẩu</button>
+    </a>
                                                                 <a href="reg-students.php?delid=<?php echo htmlentities($result->id); ?>" onclick="return confirm('Bạn có chắc muốn xóa người này?');">
                                                                     <button class="btn btn-warning">Xóa</button>
                                                                 </a>

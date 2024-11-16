@@ -19,6 +19,18 @@ if (strlen($_SESSION['alogin']) == 0) {
         $stock = $_POST['quantity'];
         $method = $_POST['method'];
 
+        // Kiểm tra sự tồn tại của ISBN trong cơ sở dữ liệu
+        $sql_check_isbn = "SELECT * FROM sach WHERE ISBN=:isbn";
+        $query_check_isbn = $dbh->prepare($sql_check_isbn);
+        $query_check_isbn->bindParam(':isbn', $isbn, PDO::PARAM_STR);
+        $query_check_isbn->execute();
+
+        if ($query_check_isbn->rowCount() > 0) {
+            $_SESSION['error'] = "ISBN này đã tồn tại";
+            header('location:manage-books.php');
+            exit(); // Dừng thực thi mã để không tiếp tục xử lý
+        }
+
         // Xử lý ảnh
         $image = $_FILES["book_image"]["name"];
         $image_tmp = $_FILES["book_image"]["tmp_name"];
@@ -158,7 +170,7 @@ if (strlen($_SESSION['alogin']) == 0) {
                                     <!-- ISBN -->
                                     <div class="form-group">
                                         <label>Mã số tiêu chuẩn quốc tế cho sách (ISBN)<span style="color:red;">*</span></label>
-                                        <input class="form-control" type="text" name="isbn" required autocomplete="off" />
+                                        <input class="form-control" type="text" name="isbn" pattern="\d{6}" required autocomplete="off" />
                                         <p class="help-block">ISBN là mã số tiêu chuẩn quốc tế cho sách. ISBN phải là duy nhất</p>
                                     </div>
 
