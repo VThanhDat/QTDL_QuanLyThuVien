@@ -20,7 +20,7 @@ if (strlen($_SESSION['alogin']) == 0) {
         $method = $_POST['method'];
 
         // Kiểm tra sự tồn tại của ISBN trong cơ sở dữ liệu
-        $sql_check_isbn = "SELECT * FROM sach WHERE ISBN=:isbn";
+        $sql_check_isbn = "SELECT * FROM sach WHERE ISBNNumber=:isbn";
         $query_check_isbn = $dbh->prepare($sql_check_isbn);
         $query_check_isbn->bindParam(':isbn', $isbn, PDO::PARAM_STR);
         $query_check_isbn->execute();
