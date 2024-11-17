@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Nov 15, 2024 at 04:23 AM
+-- Generation Time: Nov 16, 2024 at 06:18 AM
 -- Server version: 8.0.39
 -- PHP Version: 8.1.10
 
@@ -100,20 +100,8 @@ CREATE TABLE `ctmuontra` (
 --
 
 INSERT INTO `ctmuontra` (`id`, `BookId`, `ReaderId`, `IssuesDate`, `ReturnDate`, `QuantityBorrow`, `Method`, `BorrowStatus`) VALUES
-(69, 27, 1, '2024-11-08 06:01:30', '2024-11-14 18:48:50', 1, 1, 2),
-(70, 26, 1, '2024-11-08 06:11:18', '2024-11-08 13:11:41', 1, 1, NULL),
-(71, 36, 2, '2024-11-08 13:13:02', '2024-11-08 13:13:09', 1, 0, 2),
-(72, 36, 6, '2024-11-14 18:31:09', '2024-11-14 18:38:05', 1, 0, 2),
-(73, 36, 6, '2024-11-14 18:42:02', '2024-11-14 18:42:44', 1, 0, 2),
-(74, 28, 6, '2024-11-14 18:42:33', '2024-11-14 18:43:37', 1, 0, 2),
-(75, 36, 6, '2024-11-14 18:49:33', '2024-11-14 18:51:21', 1, 0, 2),
-(76, 36, 1, '2024-11-14 18:50:00', '2024-11-14 18:50:24', 1, 0, 2),
-(77, 36, 2, '2024-11-14 18:51:08', '2024-11-14 19:05:49', 1, 0, 2),
-(78, 36, 1, '2024-11-14 11:53:15', '2024-11-14 19:05:52', 1, 1, 2),
-(80, 36, 1, '2024-11-14 12:06:51', '2024-11-16 17:00:00', 1, 1, 1),
-(81, 36, 4, '2024-11-14 12:07:09', '2024-11-14 19:08:52', 1, 1, 2),
-(82, 36, 6, '2024-11-14 12:07:40', '2024-11-16 17:00:00', 1, 1, 1),
-(83, 26, 1, '2024-11-15 04:09:50', NULL, 1, 0, 1);
+(85, 36, 1, '2024-11-15 09:11:48', NULL, 1, 0, 1),
+(86, 27, 1, '2024-11-15 02:13:42', '2024-11-15 09:14:35', 1, 1, 2);
 
 -- --------------------------------------------------------
 
@@ -142,7 +130,7 @@ INSERT INTO `docgia` (`id`, `FullName`, `EmailId`, `MobileNumber`, `Password`, `
 (3, 'qui', 'qui@gmail.com', '0123334458', 'e10adc3949ba59abbe56e057f20f883e', 1, '2024-10-15 15:50:17', '2024-11-14 19:26:44'),
 (4, 'khai', 'khai@gmail.com', '0123334457', 'e10adc3949ba59abbe56e057f20f883e', 1, '2024-11-14 17:27:47', '2024-11-14 19:26:40'),
 (6, 'cuong', 'cuong@gmail.com', '0123334456', 'e10adc3949ba59abbe56e057f20f883e', 1, '2024-11-14 17:28:52', '2024-11-14 19:26:33'),
-(9, 'dddd', 'dddd@gmail.com', '1231232131', 'e10adc3949ba59abbe56e057f20f883e', 1, '2024-11-15 04:22:18', NULL);
+(11, 'datdat', 'datdat@gmail.com', '0123456777', 'e10adc3949ba59abbe56e057f20f883e', 1, '2024-11-15 11:05:08', '2024-11-15 11:07:32');
 
 -- --------------------------------------------------------
 
@@ -170,16 +158,16 @@ CREATE TABLE `sach` (
 --
 
 INSERT INTO `sach` (`id`, `BookName`, `CatId`, `AuthorId`, `ISBNNumber`, `BookPrice`, `RegDate`, `updationDate`, `Image`, `Quantity`, `Stock`, `Method`) VALUES
-(26, 'Sức Mạnh Của EQ - Đánh Thức Trí Tuệ Cảm Xúc - Làm Chủ Ngôn Ngữ - Thu Phục Lòng Người', 1, 1, 12323, 20000.00, '2024-10-30 11:21:03', '2024-11-15 04:20:05', 'bia_1_suc-manh-cua-eq.webp', 20, 19, 1),
-(27, 'Trở Về Không - Trải Nghiệm Ho\'oponopono', 2, 2, 1123, 45120.00, '2024-10-30 11:22:51', '2024-11-14 18:48:50', 'sach-tro-ve-khong-trai-nghiem-hooponopono.webp', 20, 20, 1),
+(26, 'Sức Mạnh Của EQ - Đánh Thức Trí Tuệ Cảm Xúc - Làm Chủ Ngôn Ngữ - Thu Phục Lòng Người', 1, 1, 12323, 20000.00, '2024-10-30 11:21:03', '2024-11-15 08:29:03', 'bia_1_suc-manh-cua-eq.webp', 20, 20, 1),
+(27, 'Trở Về Không - Trải Nghiệm Ho\'oponopono', 2, 2, 1123, 45120.00, '2024-10-30 11:22:51', '2024-11-15 09:14:35', 'sach-tro-ve-khong-trai-nghiem-hooponopono.webp', 20, 20, 1),
 (28, '30 Tuổi - Mọi Thứ Chỉ Mới Bắt Đầu', 1, 2, 1000, 87750.00, '2024-10-30 11:23:14', '2024-11-08 11:37:31', '30Tuổi-MọiThứChỉMớiBắtĐầu.webp', 20, 20, 0),
 (29, 'Bắt Đầu Cuộc Hành Trình Nội Tại Bản Lĩnh', 2, 2, 212, 30420.00, '2024-10-30 11:24:04', '2024-11-08 08:43:41', 'NoiTaiBanLinh.webp', 20, 20, 1),
 (31, 'Chia Sẻ Từ Trái Tim (Thích Pháp Hòa)', 2, 2, 1123, 122640.00, '2024-10-30 11:22:51', '2024-10-30 12:49:26', 'chiasetutraitim-bia.webp', 20, 20, 0),
 (32, 'Hiểu Về Trái Tim (Tái Bản 2023)', 2, 2, 1000, 135880.00, '2024-10-30 11:23:14', '2024-11-14 18:23:51', 'hiuvetraitim.webp', 30, 30, 0),
 (33, 'Vượt Qua Bản Ngã - Ego Is The Enemy', 2, 2, 2121, 114730.00, '2024-10-30 11:24:04', '2024-11-15 04:05:35', 'ego.webp', 30, 30, 0),
-(34, 'Ảo Tưởng Tích Cực - Useful Delusions', 2, 1, 12345, 61620.00, '2024-10-30 11:47:11', '2024-11-08 12:11:42', 'AoTuongTichCuc.webp', 50, 50, 0),
+(34, 'Ảo Tưởng Tích Cực - Useful Delusions', 2, 1, 123456, 61620.00, '2024-10-30 11:47:11', '2024-11-16 06:13:50', 'AoTuongTichCuc.webp', 50, 50, 0),
 (35, 'Giải Mã Hoóc-Môn Dopamin', 1, 1, 1234, 128700.00, '2024-10-30 12:55:02', '2024-11-15 04:02:55', 'Giaima.webp', 10, 10, 0),
-(36, 'Tư Duy Ngược', 1, 1, 111, 69500.00, '2024-11-08 12:42:19', '2024-11-15 04:05:52', '1731069739.webp', 2, 0, 1);
+(36, 'Tư Duy Ngược', 1, 1, 111, 69500.00, '2024-11-08 12:42:19', '2024-11-15 09:11:52', '1731069739.webp', 1, 0, 1);
 
 -- --------------------------------------------------------
 
@@ -316,31 +304,31 @@ ALTER TABLE `theloai`
 -- AUTO_INCREMENT for table `ctmuontra`
 --
 ALTER TABLE `ctmuontra`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=84;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=87;
 
 --
 -- AUTO_INCREMENT for table `docgia`
 --
 ALTER TABLE `docgia`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `sach`
 --
 ALTER TABLE `sach`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
 
 --
 -- AUTO_INCREMENT for table `tacgia`
 --
 ALTER TABLE `tacgia`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `theloai`
 --
 ALTER TABLE `theloai`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- Constraints for dumped tables
